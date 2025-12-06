@@ -52,6 +52,14 @@ func set_stream_settings(args URLmap, dst *v4.StreamConfig) (e error) {
 		} // End of `switch (args[TCP_HeaderType])`
 		break
 
+	case "grpc":
+		map_normal (args, GRPC_MultiMode, "false")
+		e = unmarshal_H (&dst.GRPCSettings,
+			fmt.Sprintf (`{"serviceName": "%s", "multiMode": %s, "mode": "%s"}`,
+				args[GRPC_ServiceName], args[GRPC_MultiMode], args[GRPC_Mode]),
+		);
+		break
+
 	default:
 		return not_implemented ("network " + args[Network])
 	}

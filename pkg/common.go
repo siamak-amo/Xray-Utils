@@ -27,6 +27,9 @@ const (
 	TCP_HTTP_Path
 	WS_Path                // web socket
 	WS_Headers
+	GRPC_Mode               // GRPC
+	GRPC_MultiMode
+	GRPC_ServiceName
 	// Protocol parts
 	Vxess_ID  // vless & vmess  we call them vxess
 	Vless_ENC

@@ -59,6 +59,11 @@ func parse_vless_url (u *url.URL) (URLmap) {
 		res[TCP_HeaderType] = Pop(params, "headerType")
 		break;
 
+	case "grpc":
+		res[GRPC_Mode] = Pop(params, "mode")
+		res[GRPC_MultiMode] = Pop(params, "multiMode")
+		res[GRPC_ServiceName] = Pop(params, "serviceName")
+		break;
 	default:
 		break;
 	}

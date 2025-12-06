@@ -61,17 +61,23 @@ func Test_parse_vless_url_3 (t *testing.T) {
 }
 
 func Test_parse_vless_url_4 (t *testing.T) {
-	const VLESS_TEST_4 = "vless://fc6395b9-8060@usa-join.outline-vpn.fun:444?mode=gun&security=reality&encryption=test_algorithm&pbk=U79mwBYXYzaNs1L57EDyJNC5p8HSrQYx1GDnBdttgmw&fp=firefox&spx=%2Fvideos%2F&type=grpc&serviceName=Telegram"
+	const VLESS_TEST_4 = "vless://0d0245cd-8412@usa-join.outline-vpn.fun:444?mode=gun&security=tls&encryption=test_algorithm&alpn=h2,http/1.1&fp=chrome&type=grpc&serviceName=@Gigiv2ray&sni=RadioTeHran.oRG#Test4"
 	umap, e := ParseURL(VLESS_TEST_4);
 	if nil != e {
 		t.Fatalf ("parse_vless_url failed: %v\n", e)
 	}
 
-	umap.Assert (t, Protocol,		"vless")
-	umap.Assert (t, ServerAddress,	"usa-join.outline-vpn.fun")
-	umap.Assert (t, ServerPort,		"444")
-	umap.Assert (t, Vxess_ID,		"fc6395b9-8060")
-	umap.Assert (t, Vless_ENC,		"test_algorithm")
-	umap.Assert (t, Security,		"reality")
-	umap.Assert (t, Network,		"grpc")
+	umap.Assert (t, Protocol,			"vless")
+	umap.Assert (t, ServerAddress,		"usa-join.outline-vpn.fun")
+	umap.Assert (t, ServerPort,			"444")
+	umap.Assert (t, Vless_ENC,			"test_algorithm")
+
+	umap.Assert (t, Security,			"tls")
+	umap.Assert (t, TLS_sni,			"RadioTeHran.oRG")
+	umap.Assert (t, TLS_fp,				"chrome")
+	umap.Assert (t, TLS_ALPN,			"h2,http/1.1")
+
+	umap.Assert (t, Network,			"grpc")
+	umap.Assert (t, GRPC_Mode,			"gun")
+	umap.Assert (t, GRPC_ServiceName,	"@Gigiv2ray")
 }
