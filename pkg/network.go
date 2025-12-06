@@ -3,7 +3,7 @@ package pkg
 import (
 	"fmt"
 	"strings"
-	v4 "github.com/v2fly/v2ray-core/v5/infra/conf/v4"
+	core "github.com/xtls/xray-core/infra/conf"
 )
 
 func set_tls_alpn (args URLmap) {
@@ -21,7 +21,7 @@ func set_tls_alpn (args URLmap) {
 	args[TLS_ALPN] = res
 }
 
-func set_stream_settings(args URLmap, dst *v4.StreamConfig) (e error) {
+func set_stream_settings(args URLmap, dst *core.StreamConfig) (e error) {
 	switch (args[Network]) {
 	case "ws":
 		e = unmarshal_H (&dst.WSSettings,
@@ -91,12 +91,12 @@ func set_stream_settings(args URLmap, dst *v4.StreamConfig) (e error) {
 }
 
 
-func Gen_streamSettings(args URLmap) (dst *v4.StreamConfig, e error) {
+func Gen_streamSettings(args URLmap) (dst *core.StreamConfig, e error) {
 	// Set the default network to tcp and security to none
 	map_normal (args, Network, "tcp")
 	map_normal (args, Security, "none")
 	map_normal (args, TCP_HeaderType, "none")
-	dst = &v4.StreamConfig{}
+	dst = &core.StreamConfig{}
 	if e = unmarshal_H (dst,
 		fmt.Sprintf (`{"network": "%s", "security": "%s"}`,
 			args[Network], args[Security],

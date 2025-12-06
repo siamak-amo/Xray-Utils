@@ -2,13 +2,13 @@ package pkg
 
 import (
 	"fmt"
-	v4 "github.com/v2fly/v2ray-core/v5/infra/conf/v4"
+	core "github.com/xtls/xray-core/infra/conf"
 )
 
 // internal
-func Gen_vmess(args URLmap) (dst *v4.OutboundDetourConfig, e error) {
+func Gen_vmess(args URLmap) (dst *core.OutboundDetourConfig, e error) {
     map_normal (args, Vmess_Sec, "none")
-    dst = &v4.OutboundDetourConfig{}
+    dst = &core.OutboundDetourConfig{}
     if e = unmarshal_H (dst,
         fmt.Sprintf (
             `{

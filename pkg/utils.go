@@ -3,20 +3,20 @@ package pkg
 import (
 	"fmt"
 
-	v4 "github.com/v2fly/v2ray-core/v5/infra/conf/v4"
+	core "github.com/xtls/xray-core/infra/conf"
 )
 
 
-func Gen_main(input string) (dst *v4.Config, e error) {
-	dst = &v4.Config{}
+func Gen_main(input string) (dst *core.Config, e error) {
+	dst = &core.Config{}
 	if e = unmarshal_H (dst, input); nil != e {
 		// log
 	}
 	return
 }
 
-func Gen_inbound(input string) (dst []v4.InboundDetourConfig, e error) {
-	dst = make ([]v4.InboundDetourConfig, 0)
+func Gen_inbound(input string) (dst []core.InboundDetourConfig, e error) {
+	dst = make ([]core.InboundDetourConfig, 0)
 	if e = unmarshal_H (&dst, input); nil != e {
 		// log
 	}
@@ -24,8 +24,8 @@ func Gen_inbound(input string) (dst []v4.InboundDetourConfig, e error) {
 }
 
 // internal
-func Gen_outbound(args URLmap, template string) (dst []v4.OutboundDetourConfig, e error) {
-	dst = make ([]v4.OutboundDetourConfig, 0)
+func Gen_outbound(args URLmap, template string) (dst []core.OutboundDetourConfig, e error) {
+	dst = make ([]core.OutboundDetourConfig, 0)
 	if e = unmarshal_H (&dst, template); nil != e {
 		// log
 		return

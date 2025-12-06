@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"encoding/json"
 
-	v4 "github.com/v2fly/v2ray-core/v5/infra/conf/v4"
+	core "github.com/xtls/xray-core/transport/internet"
 )
 
 type TestCase[T any] struct {
@@ -72,7 +72,7 @@ type OutboundDetourConfig[SETTINGS any] struct {
 	Protocol       string           `json:"protocol"`
 	Tag            string           `json:"tag"`
 	Settings       SETTINGS         `json:"settings"`
-	StreamSetting  *v4.StreamConfig `json:"streamSettings"`
+	StreamSetting  *core.StreamConfig `json:"streamSettings"`
 }
 
 // vnext for vless/vmess, account can be any of xxxAccount types
