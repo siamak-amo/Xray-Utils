@@ -83,8 +83,7 @@ func set_stream_settings(args URLmap, dst *v4.StreamConfig) (e error) {
 			// log
 		}
 		break;
-	case "reality":
-		return not_implemented ("reality")
+
 	default:
 		return not_implemented ("security " + args[Security])
 	}
