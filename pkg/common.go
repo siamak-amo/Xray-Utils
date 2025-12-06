@@ -3,6 +3,7 @@ package pkg
 import (
 	"fmt"
 	"errors"
+	"strings"
 	"encoding/json"
 )
 
@@ -58,4 +59,15 @@ func map_normal (m URLmap, key URLMapper, def_val string) (string){
 
 func not_implemented (feature string) error {
     return errors.New(fmt.Sprintf ("%s - not implemented", feature))
+}
+
+func mk_json_from_csv (csv string) string {
+	var res string
+	for _, key := range strings.Split(csv, ",") {
+		res += `"` + key + `",`
+	}
+	if len(res) >= 1 {
+		res = res[:len(res)-1]
+	}
+	return res
 }

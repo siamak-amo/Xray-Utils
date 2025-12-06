@@ -2,24 +2,8 @@ package pkg
 
 import (
 	"fmt"
-	"strings"
 	core "github.com/xtls/xray-core/infra/conf"
 )
-
-func set_tls_alpn (args URLmap) {
-	var res string
-	if _, ok := args[TLS_ALPN]; !ok {
-		args[TLS_ALPN] = `"h2", "http/1.1"`
-		return
-	}
-	for _, key := range strings.Split(args[TLS_ALPN], ",") {
-		res += `"` + key + `",`
-	}
-	if len(res) >= 1 {
-		res = res[:len(res)-1]
-	}
-	args[TLS_ALPN] = res
-}
 
 func set_stream_settings(args URLmap, dst *core.StreamConfig) (e error) {
 	switch (args[Network]) {
@@ -73,7 +57,9 @@ func set_stream_settings(args URLmap, dst *core.StreamConfig) (e error) {
 
 	case "tls":
 		map_normal (args, TLS_AllowInsecure, "true")
-		set_tls_alpn (args)
+		map_normal (args, TLS_ALPN, "h2,http/1.1")
+
+		args[TLS_ALPN] = mk_json_from_csv (args[TLS_ALPN])
 		if e = unmarshal_H (&dst.TLSSettings,
 			fmt.Sprintf (
 				`{"servername": "%s", "allowInsecure": %s, "alpn": [%s], "fingerprint": "%s"}`,
