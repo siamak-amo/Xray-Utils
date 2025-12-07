@@ -16,11 +16,18 @@ const (
 	Protocol
 	Network
 	Security
-	// Security config
+	// Security: TLS
 	TLS_sni
 	TLS_ALPN
 	TLS_fp // fingerprint
 	TLS_AllowInsecure
+	// Security: reality
+	REALITY_fp // fingerprint
+	REALITY_sni
+	REALITY_Show
+	REALITY_PublicKey
+	REALITY_ShortID
+	REALITY_SpiderX
 	// Stream type specific parts
 	TCP_HeaderType         // tcp
 	TCP_HTTP_Host

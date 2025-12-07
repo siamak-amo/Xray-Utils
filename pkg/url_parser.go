@@ -75,6 +75,14 @@ func parse_vless_url (u *url.URL) (URLmap) {
 		res[TLS_ALPN] = Pop(params, "alpn")
 		break;
 
+	case "reality":
+		res[REALITY_fp] = Pop(params, "fp")
+		res[REALITY_sni] = Pop(params, "sni")
+		res[REALITY_ShortID] = Pop(params, "sid")
+		res[REALITY_SpiderX] = Pop(params, "spx")
+		res[REALITY_PublicKey] = Pop(params, "pbk")
+		break;
+
 	default:
 		break;
 	}

@@ -52,6 +52,17 @@ func set_sec_tls (args URLmap, dst *core.StreamConfig) (error) {
 	);
 }
 
+func set_sec_reality (args URLmap, dst *core.StreamConfig) (error) {
+	return unmarshal_H (&dst.REALITYSettings,
+		fmt.Sprintf (
+			`{"serverName": "%s", "fingerprint": "%s", "show": %s,
+              "publicKey": "%s", "shortId": "%s", "spiderX": "%s"}`,
+			args[REALITY_sni], args[REALITY_fp], args[REALITY_Show],
+			args[REALITY_PublicKey], args[REALITY_ShortID], args[REALITY_SpiderX],
+		),
+	);
+}
+
 func set_stream_settings(args URLmap, dst *core.StreamConfig) (e error) {
 	switch (args[Network]) {
 	case "ws":
@@ -82,7 +93,12 @@ func set_stream_settings(args URLmap, dst *core.StreamConfig) (e error) {
 		e = set_sec_tls (args, dst)
 		break;
 
-	case "reality", "xtls":
+	case "reality":
+		map_normal (args, REALITY_Show, "false")
+		e = set_sec_reality (args, dst);
+		break;
+
+	case "xtls":
 		return not_implemented ("security " + args[Security]);
 
 	default:
