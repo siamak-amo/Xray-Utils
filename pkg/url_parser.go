@@ -4,6 +4,7 @@ package pkg
 import (
 	"fmt"
 	"errors"
+	"strings"
 	"net/url"
 	"encoding/base64"
 )
@@ -19,8 +20,9 @@ func ParseURL(link string) (URLmap, error) {
 		return parse_vless_url (u), nil
 	case "vmess":
 		return parse_vmess_url (link)
-
-	case "trojan","ss":
+	case "ss":
+		return parse_ss_url (u)
+	case "trojan":
 		return nil, not_implemented (u.Scheme)
 
 	default:
@@ -143,5 +145,27 @@ func parse_vmess_url (input string) (URLmap, error) {
 			fmt.Printf ("parse_vmess_url: parameter '%v' was ignored.\n", key)
 		}
 	}
+	return res, nil
+}
+
+// 	url:  "vmess://BASE64(method:password)@address:port"
+func parse_ss_url (u *url.URL) (URLmap, error) {
+	res := make (URLmap, 0)
+
+	decoded, e := base64.StdEncoding.DecodeString(u.User.Username())
+	if nil != e {
+		return nil, e
+	}
+
+	mp := strings.Split (string(decoded), ":")
+	if len(mp) >= 1 {
+		res[SS_Method] = mp[0];
+	}
+	if len(mp) >= 2 {
+		res[SS_Password] = mp[1];
+	}
+	res[Protocol] = "shadowsocks"
+	res[ServerPort] = u.Port()
+	res[ServerAddress] = u.Hostname()
 	return res, nil
 }

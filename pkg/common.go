@@ -47,6 +47,8 @@ const (
 	Vless_Level
 	Vmess_Sec
 	Vmess_AlterID
+	SS_Password
+	SS_Method
 )
 
 func unmarshal_H (t interface{}, input string) (error) {
