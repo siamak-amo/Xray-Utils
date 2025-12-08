@@ -17,7 +17,7 @@ func ParseURL(link string) (URLmap, error) {
 	case "vless":
 		return parse_vless_url (u), nil
 	case "vmess":
-		return nil, nil
+		return parse_vmess_url (link)
 
 	case "trojan","ss":
 		return nil, not_implemented (u.Scheme)
@@ -86,4 +86,61 @@ func parse_vless_url (u *url.URL) (URLmap) {
 		}
 	}
 	return res
+}
+
+// 	url:  "vmess://BASE64(Json(key: value, ...))"
+func parse_vmess_url (input string) (URLmap, error) {
+	if (len (input) <= 8) { // 'vmess://'
+		return nil, errors.New ("Invalid URL")
+	}
+	decoded, e := base64.StdEncoding.DecodeString(input[8:])
+	if nil != e {
+		return nil, e
+	}
+	dst := make(Str2Str, 0)
+	if e = unmarshal_H (&dst, string(decoded)); nil != e {
+		return nil, e
+	}
+
+	res := make (URLmap, 0)
+	res[Protocol] = "vmess"
+	res[ServerAddress] = dst.Pop ("add")
+	res[ServerPort] = dst.Pop ("port")
+	res[Vxess_ID] = dst.Pop ("id")
+	res[Network] = dst.Pop ("net")
+
+	switch (res[Network]) {
+	case "tcp":
+		res[TCP_HTTP_Host] = dst.Pop ("host")
+		res[TCP_HTTP_Path] = dst.Pop ("path")
+		res[TCP_HeaderType] = dst.Pop ("type")
+		break;
+
+	case "grpc":
+		res[GRPC_Mode] = dst.Pop ("type")
+		break;
+
+	case "ws":
+		res[WS_Path] = dst.Pop ("path")
+		res[WS_Headers] = dst.Pop ("host")
+		break;
+
+	default:
+		break;
+	}
+
+	if s := dst.Pop ("tls"); "tls" == s {
+		res[Security] = "tls"
+		res[TLS_sni] = dst.Pop ("sni")
+		res[TLS_fp] = dst.Pop ("fp")
+		res[TLS_ALPN] = dst.Pop ("alpn")
+	}
+
+	dst.Pop ("aid"); dst.Pop ("scy"); dst.Pop ("ps"); dst.Pop ("v") // unused
+	for key, v := range dst {
+		if len(v) >= 1 {
+			fmt.Printf ("parse_vmess_url: parameter '%v' was ignored.\n", key)
+		}
+	}
+	return res, nil
 }
