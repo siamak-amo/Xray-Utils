@@ -160,3 +160,32 @@ func Test_parse_vmess_url_3 (t *testing.T) {
 	umap.Assert (t, Security,		"tls")
 	umap.Assert (t, TLS_sni,		"obdii.cfd")
 }
+
+// Simple shadowsocks test
+func Test_parse_ss_url_1 (t *testing.T) {
+	const SS_TEST_1 = "ss://YWVzLTEyOC1nY20=@104.234.168.146:16899#ConfigV2RayNG"
+	umap, e := ParseURL(SS_TEST_1)
+	if nil != e {
+		t.Fatalf ("parse_ss_url failed: %v\n", e)
+	}
+
+	umap.Assert (t, Protocol,		 "shadowsocks")
+	umap.Assert (t, ServerAddress,	 "104.234.168.146")
+	umap.Assert (t, ServerPort,		 "16899")
+	umap.Assert (t, SS_Method,		 "aes-128-gcm")
+}
+
+// With password
+func Test_parse_ss_url_2 (t *testing.T) {
+	const SS_TEST_2 = "ss://YWVzLTI1Ni1nY206ZTliNjBjZmEtMjc0ZS00Y2RkLTg4MWMtNmE1ZTZhZTA4ZjEw@fell3.dogsvpn.top:7704#ConfigV2RayNG"
+	umap, e := ParseURL(SS_TEST_2)
+	if nil != e {
+		t.Fatalf ("parse_ss_url failed: %v\n", e)
+	}
+
+	umap.Assert (t, Protocol,		 "shadowsocks")
+	umap.Assert (t, ServerAddress,	 "fell3.dogsvpn.top")
+	umap.Assert (t, ServerPort,		 "7704")
+	umap.Assert (t, SS_Method,		 "aes-256-gcm")
+	umap.Assert (t, SS_Password,	 "e9b60cfa-274e-4cdd-881c-6a5e6ae08f10")
+}

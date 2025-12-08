@@ -1,4 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+//
+// These types are explicitly for testing purposes,
+// and they are not compatible with xray-core.
 package pkg
 
 import (
@@ -80,10 +83,22 @@ type OutboundDetourConfig[SETTINGS any] struct {
 type VXessOutboundConfig[T any] struct {
 	Vnext []T						`json:"vnext"`
 }
+// for shadowsocks and trojan
+type ServerConfig[T any] struct {
+	Servers  []T                    `json:"servers"`
+}
+
 type VXessOutboundVnext[ACCOUNT any] struct {
 	Address string					`json:"address"`
 	Port    int						`json:"port"`
 	Users   []ACCOUNT				`json:"users"`
+}
+
+type ShadojanServer struct { // shadowsocks and trojan!
+	Address  string	                `json:"address"`
+	Port     int		            `json:"port"`
+	Method   string	                `json:"method"`
+	Password string                 `json:"password"`
 }
 
 type VMessAccount struct {
@@ -100,6 +115,7 @@ type VLessAccount struct {
 // Complete types to be used in testings
 type VLessCFG OutboundDetourConfig[VXessOutboundConfig[VXessOutboundVnext[VLessAccount]]]
 type VMessCFG OutboundDetourConfig[VXessOutboundConfig[VXessOutboundVnext[VMessAccount]]]
+type ServerCFG OutboundDetourConfig[ServerConfig[ShadojanServer]]
 
 type StreamConfig struct {
 	Network             string               `json:"network"`
