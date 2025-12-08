@@ -100,3 +100,62 @@ func Test_parse_vless_url_5 (t *testing.T) {
 	umap.Assert (t, REALITY_SpiderX,	"/vpn4You/test")
 	umap.Assert (t, REALITY_PublicKey,	"z1tAnqd5RA4I99LrK5FCJgjCd")
 }
+
+// Simple vmess test
+func Test_parse_vmess_url_1 (t *testing.T) {
+	const VMESS_TEST_1 = "vmess://eyJhZGQiOiJzZWxsdmlwdnBuLm15aXJhbjEucHciLCJhaWQiOiIwIiwiaG9zdCI6InNuYXBwLmlyIiwiaWQiOiIwZDBjZTMwMC03NDg5LTRiNmMtYmM1YS00YWYzYTU2OTRjMGMiLCJuZXQiOiJ0Y3AiLCJwYXRoIjoiLyIsInBvcnQiOiIyMDg3IiwicHMiOiJ0ZXN0MUBzZWxsX3ZpcHZwbiIsInNjeSI6ImF1dG8iLCJzbmkiOiIiLCJ0bHMiOiIiLCJ0eXBlIjoiaHR0cCIsInYiOiIyIn0="
+	umap, e := ParseURL(VMESS_TEST_1)
+	if nil != e {
+		t.Fatalf ("parse_vmess_url failed: %v\n", e)
+	}
+
+	umap.Assert (t, Protocol,		"vmess")
+	umap.Assert (t, ServerAddress,	"sellvipvpn.myiran1.pw")
+	umap.Assert (t, ServerPort,		"2087")
+	umap.Assert (t, Vxess_ID,		"0d0ce300-7489-4b6c-bc5a-4af3a5694c0c")
+
+	umap.Assert (t, TCP_HeaderType, "http")
+	umap.Assert (t, TCP_HTTP_Path,	"/")
+	umap.Assert (t, TCP_HTTP_Host,	"snapp.ir")
+}
+
+// Vmess over tls over grpc
+func Test_parse_vmess_url_2 (t *testing.T) {
+	const VMESS_TEST_2 = "vmess://eyJhZGQiOiIxMDQuMjEuMjUuNjUiLCJhaWQiOiIwIiwiYWxwbiI6ImgyLGh0dHAvMS4xIiwiZnAiOiJmaXJlZm94LTY2IiwiaG9zdCI6IiIsImlkIjoiODY0MTEyYTYtY2VlYi00MTI2LWI3ZTItNTA5YzJhMjAzZDIwIiwibmV0IjoiZ3JwYyIsInBhdGgiOiIiLCJwb3J0IjoiMjA4NyIsInBzIjoiQGZyZVYycmF5TkciLCJzY3kiOiJhdXRvIiwic25pIjoibWNpLmlyIiwidGxzIjoidGxzIiwidHlwZSI6Imd1biIsInYiOiIyIn0K"
+	umap, e := ParseURL(VMESS_TEST_2)
+	if nil != e {
+		t.Fatalf ("parse_vmess_url failed: %v\n", e)
+	}
+
+	umap.Assert (t, Protocol,		"vmess")
+	umap.Assert (t, ServerAddress,	"104.21.25.65")
+	umap.Assert (t, ServerPort,		"2087")
+	
+	umap.Assert (t, Network,		"grpc")
+	umap.Assert (t, GRPC_Mode,		"gun")
+
+	umap.Assert (t, Security,		"tls")
+	umap.Assert (t, TLS_sni,		"mci.ir")
+	umap.Assert (t, TLS_fp,			"firefox-66")
+	umap.Assert (t, TLS_ALPN,		"h2,http/1.1")
+}
+
+// Vmess over ws
+func Test_parse_vmess_url_3 (t *testing.T) {
+	const VMESS_TEST_3 = "vmess://eyJhZGQiOiJvYmRpaS5jZmQiLCJhaWQiOiIwIiwiYWxwbiI6IiIsImZwIjoiIiwiaG9zdCI6Imhvc3Qub2JkaWkuY2ZkIiwiaWQiOiIwNTY0MWNmNS01OGQyLTRiYTQtYTlmMS1iM2NkYTBiMWZiMWQiLCJuZXQiOiJ3cyIsInBhdGgiOiIvbGlua3dzIiwicG9ydCI6IjQ0MyIsInBzIjoi8J+HuvCfh7hAVlBOX09DRUFOIiwic2N5IjoiYXV0byIsInNuaSI6Im9iZGlpLmNmZCIsInRscyI6InRscyIsInR5cGUiOiIiLCJ2IjoiMiJ9Cg=="
+	umap, e := ParseURL(VMESS_TEST_3)
+	if nil != e {
+		t.Fatalf ("parse_vmess_url failed: %v\n", e)
+	}
+
+	umap.Assert (t, Protocol,		"vmess")
+	umap.Assert (t, ServerAddress,	"obdii.cfd")
+	umap.Assert (t, ServerPort,		"443")
+	
+	umap.Assert (t, Network,		"ws")
+	umap.Assert (t, WS_Path,		"/linkws")
+	umap.Assert (t, WS_Headers,		"host.obdii.cfd")
+
+	umap.Assert (t, Security,		"tls")
+	umap.Assert (t, TLS_sni,		"obdii.cfd")
+}
