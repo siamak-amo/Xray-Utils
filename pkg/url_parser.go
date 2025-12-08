@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"fmt"
+	"errors"
 	"net/url"
+	"encoding/base64"
 )
 
 func ParseURL(link string) (URLmap, error) {
@@ -16,53 +18,44 @@ func ParseURL(link string) (URLmap, error) {
 		return parse_vless_url (u), nil
 	case "vmess":
 		return nil, nil
-	default:
+
+	case "trojan","ss":
 		return nil, not_implemented (u.Scheme)
+
+	default:
+		return nil, errors.New ("Invalid URL scheme")
 	}
 }
 
-func Pop(m map[string][]string, key string) (string) {
-	if v, ok := m[key]; ok {
-		// delete (m, key)
-		m[key] = []string{}
-		if len(v) >= 1 {
-			return v[0]
-		} else {
-			return ""
-		}
-	}
-	return ""
-}
-
-// 	link := fmt.Sprintf("vless://%s@%s:%d", uuid, address, port)
+// 	url: "vless://uuid@address:port?key=val..."
 func parse_vless_url (u *url.URL) (URLmap) {
 	res := make (URLmap, 0)
-	params := u.Query ()
+	params := Str2Strr(u.Query())
 
 	res[Protocol] = "vless"
 	res[ServerPort] = u.Port()
 	res[Vxess_ID] = u.User.Username()
 	res[ServerAddress] = u.Hostname()
-	res[Security] = Pop(params, "security")
-	res[Vless_ENC] = Pop(params, "encryption")
+	res[Security] = params.Pop ("security")
+	res[Vless_ENC] = params.Pop ("encryption")
 
-	res[Network] = Pop(params, "type")
+	res[Network] = params.Pop ("type")
 	switch (res[Network]) {
 	case "ws":
-		res[WS_Path] = Pop(params, "path")
-		res[WS_Headers] = Pop(params, "host")
+		res[WS_Path] = params.Pop ("path")
+		res[WS_Headers] = params.Pop ("host")
 		break;
 
 	case "tcp":
-		res[TCP_HTTP_Host] = Pop(params, "host")
-		res[TCP_HTTP_Path] = Pop(params, "path")
-		res[TCP_HeaderType] = Pop(params, "headerType")
+		res[TCP_HTTP_Host] = params.Pop ("host")
+		res[TCP_HTTP_Path] = params.Pop ("path")
+		res[TCP_HeaderType] = params.Pop ("headerType")
 		break;
 
 	case "grpc":
-		res[GRPC_Mode] = Pop(params, "mode")
-		res[GRPC_MultiMode] = Pop(params, "multiMode")
-		res[GRPC_ServiceName] = Pop(params, "serviceName")
+		res[GRPC_Mode] = params.Pop ("mode")
+		res[GRPC_MultiMode] = params.Pop ("multiMode")
+		res[GRPC_ServiceName] = params.Pop ("serviceName")
 		break;
 	default:
 		break;
@@ -70,17 +63,17 @@ func parse_vless_url (u *url.URL) (URLmap) {
 
 	switch (res[Security]) {
 	case "tls":
-		res[TLS_fp] = Pop(params, "fp")
-		res[TLS_sni] = Pop(params, "sni")
-		res[TLS_ALPN] = Pop(params, "alpn")
+		res[TLS_fp] = params.Pop ("fp")
+		res[TLS_sni] = params.Pop ("sni")
+		res[TLS_ALPN] = params.Pop ("alpn")
 		break;
 
 	case "reality":
-		res[REALITY_fp] = Pop(params, "fp")
-		res[REALITY_sni] = Pop(params, "sni")
-		res[REALITY_ShortID] = Pop(params, "sid")
-		res[REALITY_SpiderX] = Pop(params, "spx")
-		res[REALITY_PublicKey] = Pop(params, "pbk")
+		res[REALITY_fp] = params.Pop ("fp")
+		res[REALITY_sni] = params.Pop ("sni")
+		res[REALITY_ShortID] = params.Pop ("sid")
+		res[REALITY_SpiderX] = params.Pop ("spx")
+		res[REALITY_PublicKey] = params.Pop ("pbk")
 		break;
 
 	default:

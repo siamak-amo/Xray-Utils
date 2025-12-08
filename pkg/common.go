@@ -9,6 +9,9 @@ import (
 type URLMapper int
 type URLmap map[URLMapper]string
 
+type Str2Str map[string]string
+type Str2Strr map[string][]string
+
 const (
 	// Common parts
 	ServerAddress URLMapper = iota
@@ -77,4 +80,30 @@ func csv2jsonArray (csv string) string {
 		res = res[:len(res)-1]
 	}
 	return res
+}
+
+func (m Str2Strr) Pop(key string) (string) {
+	if v, ok := m[key]; ok {
+		// delete (m, key)
+		m[key] = []string{}
+		if len(v) >= 1 {
+			return v[0]
+		} else {
+			return ""
+		}
+	}
+	return ""
+}
+
+func (m Str2Str) Pop(key string) (string) {
+	if v, ok := m[key]; ok {
+		// delete (m, key)
+		m[key] = ""
+		if len(v) >= 1 {
+			return v
+		} else {
+			return ""
+		}
+	}
+	return ""
 }
