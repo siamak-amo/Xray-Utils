@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"bufio"
 	"golang.org/x/term"
+
 	flag "github.com/spf13/pflag"
+	"github.com/xtls/xray-core/core"
 )
 
 const (
@@ -145,7 +147,7 @@ func (opt Opt) Do() {
 
 		switch (opt.Cmd) {
 		case CMD_CONVERT:
-			fmt.Printf("Not Implemented -- Converting `%s` --> json\n", ln);
+			opt.Convert_url2json(ln);
 			break;
 
 		case CMD_RUN:
