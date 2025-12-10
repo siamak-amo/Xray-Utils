@@ -4,9 +4,9 @@ package log
 import "os"
 
 func Warnf(format string, args ...interface{}) {
-	Flogf (os.Stderr, "Warning", format, args)
+	Flogf (os.Stderr, "Warning", format, args...)
 }
 
 func Errorf(format string, args ...interface{}) {
-	Flogf (os.Stderr, "Error", format, args)
+	Flogf (os.Stderr, "Error", format, args...)
 }

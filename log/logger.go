@@ -9,5 +9,8 @@ import (
 )
 
 func Flogf(out *os.File, typ string, format string, args ...interface{}) {
-	fmt.Fprintf (out, "[%s]  " + format, typ, args)
+	fmt.Fprintf (out,
+		"[%s]  " + format,
+		append([]interface{}{typ}, args...)...,
+	)
 }
