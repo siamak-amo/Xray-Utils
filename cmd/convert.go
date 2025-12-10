@@ -2,11 +2,11 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
 
 	"github.com/xtls/xray-core/infra/conf"
 	pkg "github.com/siamak-amo/v2utils/pkg"
+	log "github.com/siamak-amo/v2utils/log"
 )
 
 func (opt Opt) Convert_url2json(url string) {
@@ -19,6 +19,7 @@ func (opt Opt) Convert_url2json(url string) {
 	var umap pkg.URLmap
 	umap, e = pkg.ParseURL(url);
 	if nil != e {
+		log.Errorf ("%v\n", e);
 		return
 	}
 	cf.OutboundConfigs, e = pkg.Gen_outbound(umap);
@@ -31,7 +32,7 @@ func (opt Opt) Convert_url2json(url string) {
 	b, err := json.Marshal(cf)
 	// b, err := json.MarshalIndent (cf, "", "    ")
 	if err != nil {
-		fmt.Println (e)
+		log.Errorf ("%v\n", e);
 		return
 	}
 	println (string(b));
