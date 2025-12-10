@@ -2,7 +2,11 @@
 package main
 
 import (
+	"os"
+	"fmt"
 	"bufio"
+	"strings"
+
 	pkg "github.com/siamak-amo/v2utils/pkg"
 	log "github.com/siamak-amo/v2utils/log"
 	"github.com/xtls/xray-core/core"
@@ -20,16 +24,47 @@ const (
 
 type Opt struct {
 	Cmd int // CMD_xxx
-	CFG *conf.Config
+	CFG conf.Config
 	Template core.ConfigSource
 
 	url *string
-	in_file *string  // input URLs file path
+	in_file *string // input URLs file path
+	output_dir *string // output file(s) dir
 	template_file *string // template file path
 
 	scanner *bufio.Scanner
 	GetInput func() (string, bool)
 };
+
+func (opt Opt) Out(buff []byte) (error) {
+	var ofile *os.File
+	if "" == *opt.output_dir {
+		ofile = os.Stdout
+	} else {
+		panic ("Not Implemented");
+	}
+	fmt.Fprintln(ofile, string(buff));
+	return nil
+}
+
+func GetFormatByExtension(filename string) string {
+	idx := strings.LastIndexByte(filename, '.')
+	if idx == -1 {
+		return ""
+	}
+	switch strings.ToLower(filename[idx+1:]) {
+	case "pb", "protobuf":
+		return "protobuf"
+	case "yaml", "yml":
+		return "yaml"
+	case "toml":
+		return "toml"
+	case "json", "jsonc":
+		return "json"
+	default:
+		return ""
+	}
+}
 
 // Applies the template opt.Template to @dst
 func (opt *Opt) Apply_template(dst *conf.Config) {

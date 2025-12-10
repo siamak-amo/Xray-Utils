@@ -2,20 +2,19 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
 
 	log "github.com/siamak-amo/v2utils/log"
 )
 
 // Converts proxy URL @url to template @opt.Template
-func (opt Opt) Convert_url2json(url string) {
-	// Apply the template if provided
+// returns error Only on fatal failures
+func (opt Opt) Convert_url2json(url string) (error) {
 	if "" != opt.Template.Name {
-		opt.Apply_template(opt.CFG)
+		opt.Apply_template(&opt.CFG)
 	}
 	if e := opt.Init_Outbound_byURL(url); nil != e {
-		return
+		return nil // not fatal
 	}
 
 	// TODO: skip null and empty strings
@@ -23,8 +22,12 @@ func (opt Opt) Convert_url2json(url string) {
 	b, err := json.Marshal(opt.CFG)
 	// b, err := json.MarshalIndent (cf, "", "    ")
 	if err != nil {
-		log.Errorf ("%v\n", err);
-		return
+		log.Errorf ("json.Marshal failed - %v\n", err);
+		return nil // not fatal
 	}
-	fmt.Print (string(b));
+
+	if err := opt.Out(b); nil != err {
+		return err // IO error is fatal (invalid paths / broken pipes)
+	}
+	return nil
 }

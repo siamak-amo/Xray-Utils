@@ -10,7 +10,6 @@ import (
 	flag "github.com/spf13/pflag"
 	log "github.com/siamak-amo/v2utils/log"
 	"github.com/xtls/xray-core/core"
-	"github.com/xtls/xray-core/infra/conf"
 )
 
 func (opt *Opt) RegisterFlag() {
@@ -23,6 +22,8 @@ func (opt *Opt) RegisterFlag() {
 	opt.template_file = flag.String(
 		"template", "",
 		"path to json template file");
+	opt.output_dir = flag.String(
+		"output", "", "output file path")
 
 	flag.Parse();
 }
@@ -97,9 +98,14 @@ func (opt *Opt) ParseFlags() int {
 
 // returns negative on fatal failures
 func (opt *Opt) Init() int {
+	// Initializing file paths
 	if "" != *opt.template_file {
-		opt.Template = core.ConfigSource{*opt.template_file, "json"} // TODO: fix this ***
+		opt.Template = core.ConfigSource{
+			*opt.template_file,
+			GetFormatByExtension(*opt.template_file),
+		};
 	}
+
 	switch (opt.Cmd) {
 	case CMD_RUN:
 		opt.Set_rd_url()
@@ -132,7 +138,9 @@ func (opt Opt) Do() {
 
 		switch (opt.Cmd) {
 		case CMD_CONVERT:
-			opt.Convert_url2json(ln);
+			if e := opt.Convert_url2json(ln); nil != e {
+				panic(e)
+			}
 			break;
 
 		case CMD_RUN:
@@ -146,10 +154,8 @@ func (opt Opt) Do() {
 	}
 }
 
-
 func main() {
 	opt := Opt{};
-	opt.CFG = &conf.Config{}
 
 	if ret := opt.ParseFlags(); ret < 0 {
 		os.Exit (-ret);
