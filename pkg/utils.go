@@ -25,12 +25,8 @@ func Gen_inbound(input string) (dst []core.InboundDetourConfig, e error) {
 }
 
 // internal
-func Gen_outbound(args URLmap, template string) (dst []core.OutboundDetourConfig, e error) {
+func Gen_outbound(args URLmap) (dst []core.OutboundDetourConfig, e error) {
 	dst = make ([]core.OutboundDetourConfig, 0)
-	if e = unmarshal_H (&dst, template); nil != e {
-		// log
-		return
-	}
 	switch args[Protocol] {
 	case "vless":
 		v, e := Gen_vless (args)
@@ -38,6 +34,7 @@ func Gen_outbound(args URLmap, template string) (dst []core.OutboundDetourConfig
 			dst = append (dst, *v)
 		} else {
 			fmt.Printf("Vless Error:  %v\n", e)
+			return nil, e
 		}
 		break
 	case "vmess":
