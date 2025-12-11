@@ -4,6 +4,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"net"
 	"bufio"
 	"strings"
 
@@ -127,4 +128,15 @@ func (opt *Opt) Init_Outbound_byURL(url string) (error) {
 		return e
 	}
 	return nil
+}
+
+// PickPort returns an unused TCP port
+// The port returned is highly likely to be unused, but not guaranteed.
+func PickPort() int {
+	listener, err := net.Listen("tcp4", "127.0.0.1:0")
+	if nil != err {
+		return -1
+	}
+	defer listener.Close()
+	return listener.Addr().(*net.TCPAddr).Port
 }

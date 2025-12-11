@@ -25,8 +25,8 @@ const (
 
 // Generates a minimal default config to test
 // Returns the listening port number (and -1 on failure)
-func (opt *Opt) MK_Default_TestConfig(url string) int {
-	port := 2054 // TODO: make it random
+func (opt *Opt) mk_Default_TestConfig(url string) int {
+	port := PickPort()
 	cf, e := pkg.Gen_main(fmt.Sprintf(FMT_DefaultTemplate, port))
 	if nil != e || 0 == len(cf.InboundConfigs){
 		panic (errors.New("Making test config failed."))
@@ -76,7 +76,7 @@ func test_http(dialer proxy.Dialer) error {
 }
 
 func (opt *Opt) Test_URL(url string) bool {
-	if port := opt.MK_Default_TestConfig(url); port > 0 {
+	if port := opt.mk_Default_TestConfig(url); port > 0 {
 		return opt.test_Proxy(port);
 	} else {
 		return false
