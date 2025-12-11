@@ -182,6 +182,7 @@ func (opt Opt) Do() {
 
 func main() {
 	opt := Opt{};
+	log.LogLevel = log.Info;
 
 	if ret := opt.ParseFlags(); ret < 0 {
 		os.Exit (-ret);
