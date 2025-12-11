@@ -38,6 +38,8 @@ type Opt struct {
 
 	scanner *bufio.Scanner
 	GetInput func() (string, bool)
+
+	client *core.Instance // xray-core client instance
 };
 
 func (opt Opt) Out(buff []byte) (error) {

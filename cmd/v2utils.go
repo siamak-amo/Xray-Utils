@@ -150,7 +150,22 @@ func (opt Opt) Do() {
 			break;
 
 		case CMD_RUN:
-			log.Errorf("Not Implemented -- Running xray-core with URL: `%s`\n", ln);
+			if "" != opt.Template.Name {
+				opt.Apply_template (&opt.CFG)
+			} else {
+				// TODO: Use a default template instead of dying
+				log.Errorf("no template provided! dying...\n");
+				return;
+			}
+			if e := opt.Init_Outbound_byURL(ln); nil != e {
+				break;
+			}
+			if e := opt.Run_Xray(); nil != e {
+				break;
+			} else {
+				for ;; {};
+				defer opt.Kill_Xray();
+			}
 			break;
 
 		case CMD_TEST:
