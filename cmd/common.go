@@ -31,6 +31,7 @@ type Opt struct {
 	Cmd int // CMD_xxx
 	CFG conf.Config
 	Template core.ConfigSource
+	Verbose *bool
 
 	url *string
 	in_file *string // input URLs file path
@@ -61,7 +62,7 @@ func (opt Opt) Out(buff []byte) (error) {
 			log.Errorf("Out failed to write: %v\n", err)
 			return err // fatal
 		}
-		log.Infof("wrote %s", path)
+		log.Verbosef("Wrote: %s", path)
 	}
 	return nil
 }

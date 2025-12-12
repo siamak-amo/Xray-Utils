@@ -12,12 +12,18 @@ const (
 )
 
 var (
-	LogLevel = Error; // Default
+	LogLevel int
 )
 
 func Must(level int) bool {
 	return (Verbose == LogLevel) ||
 		(None != LogLevel  &&  level >= LogLevel);
+}
+
+func Verbosef(format string, args ...interface{}) {
+	if (Verbose == LogLevel) {
+		MiniFlogf (os.Stderr, format, args...)
+	}
 }
 
 func Infof(format string, args ...interface{}) {

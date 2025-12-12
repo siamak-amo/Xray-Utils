@@ -9,6 +9,9 @@ import (
 	"runtime"
 )
 
+func Init() {
+	LogLevel = Verbose;
+}
 
 func Flogf(out *os.File, typ string, format string, args ...interface{}) {
 	if _, file, line, ok := runtime.Caller(2); ok {
@@ -21,5 +24,16 @@ func Flogf(out *os.File, typ string, format string, args ...interface{}) {
 			"[%s]  " + format,
 			append([]interface{}{typ}, args...)...,
 		)
+	}
+}
+
+func MiniFlogf(out *os.File, format string, args ...interface{}) {
+	if _, file, line, ok := runtime.Caller(2); ok {
+		fmt.Fprintf (out,
+			"%s:%d: " + format,
+			append([]interface{}{file, line}, args...)...,
+		);
+	} else {
+		fmt.Fprintf (out, format, args...);
 	}
 }

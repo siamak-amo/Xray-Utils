@@ -24,6 +24,8 @@ func (opt *Opt) RegisterFlag() {
 		"path to json template file");
 	opt.output_dir = flag.String(
 		"output", "", "output directory path")
+	opt.Verbose = flag.Bool(
+	    "verbose", false, "verbose")
 
 	flag.Parse();
 }
@@ -122,7 +124,7 @@ func (opt *Opt) Init() int {
 			opt.Set_rd_url();
 		} else if "" != *opt.in_file {
 			if e := opt.Set_rd_file(); nil != e {
-				fmt.Printf ("%v\n", e);
+				log.Errorf ("%v\n", e);
 				return -1
 			}
 		} else {
@@ -182,13 +184,14 @@ func (opt Opt) Do() {
 
 func main() {
 	opt := Opt{};
-	log.LogLevel = log.Info;
-
 	if ret := opt.ParseFlags(); ret < 0 {
 		os.Exit (-ret);
 	}
 	if ret := opt.Init(); ret < 0 {
 		os.Exit (-ret);
+	}
+	if *opt.Verbose {
+		log.LogLevel = log.Verbose;
 	}
 	opt.Do(); // The main loop
 }
