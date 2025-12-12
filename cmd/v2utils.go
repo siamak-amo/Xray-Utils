@@ -172,7 +172,11 @@ func (opt Opt) Do() {
 
 		case CMD_TEST:
 			if opt.Test_URL(ln) {
-				println(ln)
+				if *opt.Verbose {
+					log.Infof("`%s` OK.\n", ln)
+				} else {
+					println(ln)
+				}
 				if "" != *opt.output_dir {
 					opt.CFG_Out(); // Also generate json files
 				}
