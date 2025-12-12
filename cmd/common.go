@@ -10,6 +10,7 @@ import (
 
 	"hash/fnv"
 	"encoding/hex"
+	"encoding/json"
 	"path/filepath"
 
 	pkg "github.com/siamak-amo/v2utils/pkg"
@@ -44,11 +45,22 @@ type Opt struct {
 	client *core.Instance // xray-core client instance
 };
 
-func (opt Opt) Out(buff []byte) (error) {
+func (opt Opt) CFG_Out() (error) {
+	// TODO: skip null and empty strings
+	// TODO: flag to print by indent or compact
+	b, err := json.Marshal(opt.CFG)
+	// b, err := json.MarshalIndent (cf, "", "    ")
+	if err != nil {
+		log.Errorf ("json.Marshal failed - %v\n", err);
+		return nil // not fatal
+	}
+
 	if "" == *opt.output_dir {
-		fmt.Println(string(buff));
+		// Using stdout
+		println(b);
 	} else {
-		path := opt.GetOutput_filepath(buff)
+		// Write to file
+		path := opt.GetOutput_filepath(b)
 		of, err := os.OpenFile(
 			path,
 			os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644,
@@ -58,7 +70,7 @@ func (opt Opt) Out(buff []byte) (error) {
 			return err // fatal
 		}
 		defer of.Close()
-		if _, err = of.Write(buff); nil != err {
+		if _, err = of.Write(b); nil != err {
 			log.Errorf("Out failed to write: %v\n", err)
 			return err // fatal
 		}

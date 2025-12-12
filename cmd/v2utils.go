@@ -172,8 +172,10 @@ func (opt Opt) Do() {
 
 		case CMD_TEST:
 			if opt.Test_URL(ln) {
-				// TODO: On verbose, print additional info
 				println(ln)
+				if "" != *opt.output_dir {
+					opt.CFG_Out(); // Also generate json files
+				}
 			} else {
 				log.Infof("Broken URL '%s'\n", ln);
 			}
