@@ -3,15 +3,15 @@ package pkg
 
 import (
 	"fmt"
-	core "github.com/xtls/xray-core/infra/conf"
+	"github.com/xtls/xray-core/infra/conf"
 )
 
 // internal
-func Gen_vless(args URLmap) (dst *core.OutboundDetourConfig, e error) {
+func Gen_vless(args URLmap) (dst *conf.OutboundDetourConfig, e error) {
     map_normal (args, Vless_ENC, "none")
     map_normal (args, ServerPort, "443")
     map_normal (args, Vless_Level, "0")
-    dst = &core.OutboundDetourConfig{}
+    dst = &conf.OutboundDetourConfig{}
     if e = unmarshal_H (dst,
         fmt.Sprintf (
             `{

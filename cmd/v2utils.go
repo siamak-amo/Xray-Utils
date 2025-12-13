@@ -13,19 +13,11 @@ import (
 )
 
 func (opt *Opt) RegisterFlag() {
-	opt.url = flag.String(
-		"url", "",
-		"proxy URL e.g. vless://xxx");
-	opt.in_file = flag.String(
-		"input", "",
-		"path to proxy URLs file");
-	opt.template_file = flag.String(
-		"template", "",
-		"path to json template file");
-	opt.output_dir = flag.String(
-		"output", "", "output directory path")
-	opt.Verbose = flag.Bool(
-	    "verbose", false, "verbose")
+	opt.url = flag.String ("url", "", "proxy URL e.g. vless://xxx");
+	opt.in_file = flag.String ("input", "", "path to proxy URLs file");
+	opt.template_file = flag.String ("template", "", "path to json template file");
+	opt.output_dir = flag.String ("output", "", "output directory path");
+	opt.Verbose = flag.Bool ("verbose", false, "verbose");
 
 	flag.Parse();
 }

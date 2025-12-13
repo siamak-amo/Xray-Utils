@@ -3,12 +3,12 @@ package pkg
 
 import (
 	"fmt"
-	core "github.com/xtls/xray-core/infra/conf"
+	"github.com/xtls/xray-core/infra/conf"
 )
 
-func Gen_trojan (args URLmap) (dst *core.OutboundDetourConfig, e error) {
+func Gen_trojan (args URLmap) (dst *conf.OutboundDetourConfig, e error) {
     map_normal (args, ServerPort, "443")
-	dst = &core.OutboundDetourConfig{}
+	dst = &conf.OutboundDetourConfig{}
     if e = unmarshal_H (dst,
         fmt.Sprintf (
 			`{

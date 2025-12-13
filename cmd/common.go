@@ -2,7 +2,6 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"net"
 	"bufio"
@@ -10,11 +9,11 @@ import (
 
 	"hash/fnv"
 	"encoding/hex"
-	"encoding/json"
 	"path/filepath"
 
 	pkg "github.com/siamak-amo/v2utils/pkg"
 	log "github.com/siamak-amo/v2utils/log"
+
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/infra/conf"
 	"github.com/xtls/xray-core/infra/conf/serial"
@@ -42,42 +41,8 @@ type Opt struct {
 	scanner *bufio.Scanner
 	GetInput func() (string, bool)
 
-	client *core.Instance // xray-core client instance
+	Xray_instance *core.Instance // xray-core client instance
 };
-
-func (opt Opt) CFG_Out() (error) {
-	// TODO: skip null and empty strings
-	// TODO: flag to print by indent or compact
-	b, err := json.Marshal(opt.CFG)
-	// b, err := json.MarshalIndent (cf, "", "    ")
-	if err != nil {
-		log.Errorf ("json.Marshal failed - %v\n", err);
-		return nil // not fatal
-	}
-
-	if "" == *opt.output_dir {
-		// Using stdout
-		println(b);
-	} else {
-		// Write to file
-		path := opt.GetOutput_filepath(b)
-		of, err := os.OpenFile(
-			path,
-			os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644,
-		);
-		if err != nil {
-			log.Errorf("Out failed to open file: %v\n", err)
-			return err // fatal
-		}
-		defer of.Close()
-		if _, err = of.Write(b); nil != err {
-			log.Errorf("Out failed to write: %v\n", err)
-			return err // fatal
-		}
-		log.Verbosef("Wrote: %s", path)
-	}
-	return nil
-}
 
 // generates filename based on: hash(file_content)
 func (opt Opt) GetOutput_filepath(file_content []byte) string {

@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"encoding/json"
 
-	core "github.com/xtls/xray-core/transport/internet"
+	"github.com/xtls/xray-core/transport/internet"
 )
 
 type TestCase[T any] struct {
@@ -73,10 +73,10 @@ func (tc TestCase[T]) Assert (val interface{}, expected string) {
 
 // outbound, settings can be: any of xxxOutboundConfig types
 type OutboundDetourConfig[SETTINGS any] struct {
-	Protocol       string           `json:"protocol"`
-	Tag            string           `json:"tag"`
-	Settings       SETTINGS         `json:"settings"`
-	StreamSetting  *core.StreamConfig `json:"streamSettings"`
+	Protocol       string					`json:"protocol"`
+	Tag            string					`json:"tag"`
+	Settings       SETTINGS					`json:"settings"`
+	StreamSetting  *internet.StreamConfig	`json:"streamSettings"`
 }
 
 // vnext for vless/vmess, account can be any of xxxAccount types

@@ -3,20 +3,20 @@ package pkg
 
 import (
 	log "github.com/siamak-amo/v2utils/log"
-	core "github.com/xtls/xray-core/infra/conf"
+	"github.com/xtls/xray-core/infra/conf"
 )
 
 
-func Gen_main(input string) (dst *core.Config, e error) {
-	dst = &core.Config{}
+func Gen_main(input string) (dst *conf.Config, e error) {
+	dst = &conf.Config{}
 	if e = unmarshal_H (dst, input); nil != e {
 		// log
 	}
 	return
 }
 
-func Gen_inbound(input string) (dst []core.InboundDetourConfig, e error) {
-	dst = make ([]core.InboundDetourConfig, 0)
+func Gen_inbound(input string) (dst []conf.InboundDetourConfig, e error) {
+	dst = make ([]conf.InboundDetourConfig, 0)
 	if e = unmarshal_H (&dst, input); nil != e {
 		// log
 	}
@@ -24,8 +24,8 @@ func Gen_inbound(input string) (dst []core.InboundDetourConfig, e error) {
 }
 
 // internal
-func Gen_outbound(args URLmap) (dst []core.OutboundDetourConfig, e error) {
-	dst = make ([]core.OutboundDetourConfig, 0)
+func Gen_outbound(args URLmap) (dst []conf.OutboundDetourConfig, e error) {
+	dst = make ([]conf.OutboundDetourConfig, 0)
 	switch args[Protocol] {
 	case "vless":
 		v, e := Gen_vless (args)

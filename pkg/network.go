@@ -4,10 +4,10 @@ package pkg
 import (
 	"fmt"
 	"errors"
-	core "github.com/xtls/xray-core/infra/conf"
+	"github.com/xtls/xray-core/infra/conf"
 )
 
-func set_stream_tcp (args URLmap, dst *core.StreamConfig) (error) {
+func set_stream_tcp (args URLmap, dst *conf.StreamConfig) (error) {
 	switch (args[TCP_HeaderType]) {
 	case "none", "":
 		return unmarshal_H (&dst.TCPSettings, (`{"header": {"type": "none"}}`));
@@ -29,21 +29,21 @@ func set_stream_tcp (args URLmap, dst *core.StreamConfig) (error) {
 	}
 }
 
-func set_stream_ws (args URLmap, dst *core.StreamConfig) (error) {
+func set_stream_ws (args URLmap, dst *conf.StreamConfig) (error) {
 	return unmarshal_H (&dst.WSSettings,
 		fmt.Sprintf (`{"path": "%s", "headers": {"Host": "%s"}}`,
 			args[WS_Path], args[WS_Headers]),
 	);
 }
 
-func set_stream_grpc (args URLmap, dst *core.StreamConfig) (error) {
+func set_stream_grpc (args URLmap, dst *conf.StreamConfig) (error) {
 	return unmarshal_H (&dst.GRPCSettings,
 		fmt.Sprintf (`{"serviceName": "%s", "multiMode": %s, "mode": "%s"}`,
 			args[GRPC_ServiceName], args[GRPC_MultiMode], args[GRPC_Mode]),
 	);
 }
 
-func set_sec_tls (args URLmap, dst *core.StreamConfig) (error) {
+func set_sec_tls (args URLmap, dst *conf.StreamConfig) (error) {
 	args[TLS_ALPN] = csv2jsonArray (args[TLS_ALPN]);
 	return unmarshal_H (&dst.TLSSettings,
 		fmt.Sprintf (
@@ -53,7 +53,7 @@ func set_sec_tls (args URLmap, dst *core.StreamConfig) (error) {
 	);
 }
 
-func set_sec_reality (args URLmap, dst *core.StreamConfig) (error) {
+func set_sec_reality (args URLmap, dst *conf.StreamConfig) (error) {
 	return unmarshal_H (&dst.REALITYSettings,
 		fmt.Sprintf (
 			`{"serverName": "%s", "fingerprint": "%s", "show": %s,
@@ -64,7 +64,7 @@ func set_sec_reality (args URLmap, dst *core.StreamConfig) (error) {
 	);
 }
 
-func set_stream_settings(args URLmap, dst *core.StreamConfig) (e error) {
+func set_stream_settings(args URLmap, dst *conf.StreamConfig) (e error) {
 	switch (args[Network]) {
 	case "ws":
 		e = set_stream_ws (args, dst);
@@ -109,12 +109,12 @@ func set_stream_settings(args URLmap, dst *core.StreamConfig) (e error) {
 }
 
 
-func Gen_streamSettings(args URLmap) (dst *core.StreamConfig, e error) {
+func Gen_streamSettings(args URLmap) (dst *conf.StreamConfig, e error) {
 	// Set the default network to tcp and security to none
 	map_normal (args, Network, "tcp")
 	map_normal (args, Security, "none")
 	map_normal (args, TCP_HeaderType, "none")
-	dst = &core.StreamConfig{}
+	dst = &conf.StreamConfig{}
 	if e = unmarshal_H (dst,
 		fmt.Sprintf (`{"network": "%s", "security": "%s"}`,
 			args[Network], args[Security],

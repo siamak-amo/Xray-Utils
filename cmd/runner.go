@@ -22,21 +22,21 @@ func (opt *Opt) Run_Xray() error {
 	if nil != err {
 		return err
 	}
-	if opt.client, err = core.New(cf); nil != err {
+	if opt.Xray_instance, err = core.New(cf); nil != err {
 		return err
 	}
-	if err = opt.client.Start(); nil != err {
+	if err = opt.Xray_instance.Start(); nil != err {
 		return err
 	}
 	return nil
 }
 
-// Do NOT use opt.client after this call
+// Do NOT use opt.Xray_instance after this call
 func (opt Opt) Kill_Xray() {
-	if nil != opt.client {
-		if opt.client.IsRunning() {
-			opt.client.Close()
-			opt.client = nil
+	if nil != opt.Xray_instance {
+		if opt.Xray_instance.IsRunning() {
+			opt.Xray_instance.Close()
+			opt.Xray_instance = nil
 		}
 	}
 }
