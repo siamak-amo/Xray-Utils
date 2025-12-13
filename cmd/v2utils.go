@@ -154,11 +154,9 @@ func (opt Opt) Do() {
 			if e := opt.Init_Outbound_byURL(ln); nil != e {
 				break;
 			}
-			if e := opt.Run_Xray(); nil != e {
+			if e := opt.Exec_Xray(); nil != e {
+				log.Errorf("Exec xray-core failed - %v\n", e)
 				break;
-			} else {
-				for ;; {};
-				defer opt.Kill_Xray();
 			}
 			break;
 

@@ -2,7 +2,10 @@
 package main
 
 import (
+	"os"
 	"runtime"
+	"syscall"
+	"os/signal"
 
 	// pkg "github.com/siamak-amo/v2utils/pkg"
 	// log "github.com/siamak-amo/v2utils/log"
@@ -28,6 +31,19 @@ func (opt *Opt) Run_Xray() error {
 	if err = opt.Xray_instance.Start(); nil != err {
 		return err
 	}
+	return nil
+}
+
+// Run_Xray (blocking)
+func (opt *Opt) Exec_Xray() error {
+	if e := opt.Run_Xray(); nil != e {
+		return e
+	}
+	defer opt.Kill_Xray();
+
+	osSignals := make(chan os.Signal, 1)
+	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM)
+	<-osSignals
 	return nil
 }
 
