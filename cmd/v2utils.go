@@ -9,7 +9,6 @@ import (
 
 	flag "github.com/spf13/pflag"
 	log "github.com/siamak-amo/v2utils/log"
-	"github.com/xtls/xray-core/core"
 )
 
 func (opt *Opt) RegisterFlag() {
@@ -92,14 +91,6 @@ func (opt *Opt) ParseFlags() int {
 
 // returns negative on fatal failures
 func (opt *Opt) Init() int {
-	// Initializing file paths
-	if "" != *opt.template_file {
-		opt.Template = core.ConfigSource{
-			*opt.template_file,
-			GetFormatByExtension(*opt.template_file),
-		};
-	}
-
 	switch (opt.Cmd) {
 	case CMD_RUN:
 		opt.Set_rd_url()
@@ -144,14 +135,16 @@ func (opt Opt) Do() {
 			break;
 
 		case CMD_RUN:
-			if "" != opt.Template.Name {
-				opt.Apply_template (&opt.CFG)
-			} else {
-				// TODO: Use a default template instead of dying
-				log.Errorf("no template provided! dying...\n");
+			if "" == *opt.template_file {
+				log.Errorf("No template provided, using the default template\n");
+				fmt.Printf("Default template:%s\n", opt.Get_Default_Template()); // should print this
+			}
+			if e := opt.Init_CFG(); nil != e {
+				log.Errorf("Invalid template - %v\n", e)
 				return;
 			}
 			if e := opt.Init_Outbound_byURL(ln); nil != e {
+				log.Errorf("Invalid or unsupported URL - %v\n", e)
 				break;
 			}
 			if e := opt.Exec_Xray(); nil != e {

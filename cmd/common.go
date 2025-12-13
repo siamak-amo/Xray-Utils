@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 
 	pkg "github.com/siamak-amo/v2utils/pkg"
-	log "github.com/siamak-amo/v2utils/log"
 
 	"github.com/xtls/xray-core/core"
 	"github.com/xtls/xray-core/infra/conf"
@@ -29,8 +28,7 @@ const (
 
 type Opt struct {
 	Cmd int // CMD_xxx
-	CFG conf.Config
-	Template core.ConfigSource
+	CFG *conf.Config
 	Verbose *bool
 
 	url *string
@@ -75,25 +73,52 @@ func GetFormatByExtension(filename string) string {
 	}
 }
 
-// Applies the template opt.Template to @dst
-func (opt *Opt) Apply_template(dst *conf.Config) {
-	r, err := confloader.LoadConfig(opt.Template.Name)
-	if nil != err {
-		log.Errorf("%v\n", err);
-	} else {
-		c, err := serial.ReaderDecoderByFormat[opt.Template.Format](r)
-		if nil != err {
-			log.Errorf("%v\n", err);
-		} else {
-			*dst = *c  // for the first time
-
-			// TODO: maybe accept template array and merge them via:
-			// dst.Override(c, file.Name)
-		}
+// Applies the template opt.template_path to opt.CFG
+func (opt *Opt) Apply_template() error {
+	t := core.ConfigSource{
+		Name: *opt.template_file,
+		Format: GetFormatByExtension(*opt.template_file),
 	}
+	r, err := confloader.LoadConfig(t.Name)
+	if nil != err {
+		return err
+	} else {
+		c, err := serial.ReaderDecoderByFormat[t.Format](r)
+		if nil != err {
+			return err
+		}
+		opt.CFG = c;
+	}
+	return nil
 }
 
-// Initializes @opt.Cfg by provided proxy URL @url
+// Applies opt.template_path  or  the default template
+func (opt *Opt) Init_CFG() error {
+	var e error
+	if "" != *opt.template_file {
+		return opt.Apply_template()
+	} else {
+		// Apply the default template
+		if opt.CFG, e = pkg.Gen_main(opt.Get_Default_Template()); nil != e {
+			panic(e) // it's ours. broken default template
+		}
+	}
+	return nil
+}
+
+func (opt *Opt) Get_Default_Template() string {
+	switch (opt.Cmd) {
+	case CMD_RUN:
+		return DEF_Run_Template;
+	case CMD_TEST:
+		return DEF_Test_Template;
+	case CMD_CONVERT:
+		return DEF_Run_Template;
+	}
+	return "";
+}
+
+// Initializes @opt.CFG.OutboundConfig by the provided proxy URL @url
 func (opt *Opt) Init_Outbound_byURL(url string) (error) {
 	var e error
 	var umap pkg.URLmap
@@ -101,7 +126,6 @@ func (opt *Opt) Init_Outbound_byURL(url string) (error) {
 	// Parse the URL
 	umap, e = pkg.ParseURL(url);
 	if nil != e {
-		log.Errorf ("ParseURL failed - %s\n", e);
 		return e
 	}
 	// Generate outbound config

@@ -9,12 +9,14 @@ import (
 )
 
 // Converts proxy URL @url to template @opt.Template
-// returns error Only on fatal failures
+// Only returns error on fatal failures
 func (opt Opt) Convert_url2json(url string) (error) {
-	if "" != opt.Template.Name {
-		opt.Apply_template(&opt.CFG)
+	var err error
+	if err = opt.Apply_template(); nil != err {
+		return err
 	}
-	if e := opt.Init_Outbound_byURL(url); nil != e {
+	if err = opt.Init_Outbound_byURL(url); nil != err {
+		log.Errorf("Invalid or unsupported URL - %v\n", err)
 		return nil // not fatal
 	}
 
@@ -25,22 +27,26 @@ func (opt Opt) Convert_url2json(url string) (error) {
 	return nil
 }
 
-func (opt Opt) CFG_Out() (error) {
-	// TODO: skip null and empty strings
-	// TODO: flag to print by indent or compact
-	b, err := json.Marshal(opt.CFG)
-	// b, err := json.MarshalIndent (cf, "", "    ")
+// Makes output of opt.CFG, either on stdout or file
+func (opt Opt) CFG_Out(url string) (error) {
+	var err error
+	var b []byte
+
+	if "" == *opt.output_dir {
+		// Use the compact format for stdout
+		b, err = json.Marshal(opt.CFG)
+	} else {
+		b, err = json.MarshalIndent (opt.CFG, "", "    ")
+	}
 	if err != nil {
-		log.Errorf ("json.Marshal failed - %v\n", err);
-		return nil // not fatal
+		panic(err) // it's ours. we have generated opt.CFG wrong
 	}
 
 	if "" == *opt.output_dir {
-		// Using stdout
 		println(b);
 	} else {
 		// Write to file
-		path := opt.GetOutput_filepath(b)
+		path := opt.GetOutput_filepath([]byte(url))
 		of, err := os.OpenFile(
 			path,
 			os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644,
