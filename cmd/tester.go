@@ -81,5 +81,10 @@ func (opt *Opt) Test_CFG(path string) bool {
 	if e := opt.Init_CFG(); nil != e {
 		return false
 	}
+
+	// We do not use inbound configurations for testing
+	// having them may cause true-negative for us
+	// as the inbound proxy port(s) might be inuse.
+	opt.CFG.InboundConfigs = nil
 	return opt.test_Proxy();
 }
