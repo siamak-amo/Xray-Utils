@@ -30,9 +30,10 @@ func set_stream_tcp (args URLmap, dst *conf.StreamConfig) (error) {
 }
 
 func set_stream_ws (args URLmap, dst *conf.StreamConfig) (error) {
+	args[WS_Headers] = csv2jsonArray (args[WS_Headers]);
 	return unmarshal_H (&dst.WSSettings,
-		fmt.Sprintf (`{"path": "%s", "headers": {"Host": "%s"}}`,
-			args[WS_Path], args[WS_Headers]),
+		fmt.Sprintf (`{"path": "%s", "host": "%s", "headers": [%s]}`,
+			args[WS_Path], args[WS_Host], args[WS_Headers]),
 	);
 }
 

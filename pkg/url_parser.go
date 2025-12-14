@@ -45,8 +45,9 @@ func parse_vless_url (u *url.URL) (URLmap) {
 	res[Network] = params.Pop ("type")
 	switch (res[Network]) {
 	case "ws":
+		// TODO: what about WS_Headers?
 		res[WS_Path] = params.Pop ("path")
-		res[WS_Headers] = params.Pop ("host")
+		res[WS_Host] = params.Pop ("host")
 		break;
 
 	case "tcp":
@@ -124,8 +125,9 @@ func parse_vmess_url (input string) (URLmap, error) {
 		break;
 
 	case "ws":
+		// TODO: WS_Headers
 		res[WS_Path] = dst.Pop ("path")
-		res[WS_Headers] = dst.Pop ("host")
+		res[WS_Host] = dst.Pop ("host")
 		break;
 
 	default:
@@ -184,8 +186,9 @@ func parse_trojan_url (u *url.URL) (URLmap) {
 	res[Security] = params.Pop ("security")
 	switch (res[Network]) {
 	case "ws":
+		// TODO: WS_Headers
 		res[WS_Path] = params.Pop ("path");
-		res[WS_Headers] = params.Pop ("host");
+		res[WS_Host] = params.Pop ("host");
 		break;
 	case "tcp":
 		res[TCP_HTTP_Host] = params.Pop ("host");

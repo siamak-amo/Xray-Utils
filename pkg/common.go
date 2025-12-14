@@ -22,7 +22,7 @@ const (
 	Security
 	// Security: TLS
 	TLS_sni
-	TLS_ALPN
+	TLS_ALPN // Comma-separated values, no double quote
 	TLS_fp // fingerprint
 	TLS_AllowInsecure
 	// Security: reality
@@ -37,7 +37,8 @@ const (
 	TCP_HTTP_Host
 	TCP_HTTP_Path
 	WS_Path                // web socket
-	WS_Headers
+	WS_Host
+	WS_Headers // Comma-separated values, no double quote
 	GRPC_Mode               // GRPC
 	GRPC_MultiMode
 	GRPC_ServiceName

@@ -21,7 +21,7 @@ func Test_parse_vless_url_1 (t *testing.T) {
 	
 	umap.Assert (t, Network,		      "ws")
 	umap.Assert (t, Security,		      "none")
-	umap.Assert (t, WS_Headers,		      "vpn.com")
+	umap.Assert (t, WS_Host,		      "vpn.com")
 	umap.Assert (t, WS_Path,		      "/Telegram:@UnlimitedDev/www")
 }
 
@@ -155,7 +155,7 @@ func Test_parse_vmess_url_3 (t *testing.T) {
 	
 	umap.Assert (t, Network,		"ws")
 	umap.Assert (t, WS_Path,		"/linkws")
-	umap.Assert (t, WS_Headers,		"host.obdii.cfd")
+	umap.Assert (t, WS_Host,		"host.obdii.cfd")
 
 	umap.Assert (t, Security,		"tls")
 	umap.Assert (t, TLS_sni,		"obdii.cfd")
@@ -217,7 +217,7 @@ func Test_parse_trojan_url_3 (t *testing.T) {
 
 	umap.Assert (t, Network,			"ws")
 	umap.Assert (t, WS_Path,			"/Telegram@V2ray_Alpha/?ed=666")
-	umap.Assert (t, WS_Headers,			"people-jan.xxx-java.ir")
+	umap.Assert (t, WS_Host,			"people-jan.xxx-java.ir")
 
 	umap.Assert (t, Security,			"tls")
 	umap.Assert (t, TLS_sni,			"people-jan.xxx-java.ir")
