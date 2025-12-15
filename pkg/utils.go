@@ -2,6 +2,7 @@
 package pkg
 
 import (
+	"net/url"
 	log "github.com/siamak-amo/v2utils/log"
 	"github.com/xtls/xray-core/infra/conf"
 )
@@ -73,12 +74,10 @@ func Gen_outbound(args URLmap) (dst []conf.OutboundDetourConfig, e error) {
 }
 
 
-func Gen_URL(src *conf.OutboundDetourConfig) string {
+func Gen_URL(src *conf.OutboundDetourConfig) *url.URL {
 	switch (src.Protocol) {
 	case "vless":
-		if u := Gen_vless_URL(src); nil != u {
-			return u.String()
-		}
+		return Gen_vless_URL(src);
 	case "vmess":
 		break;
 	case "ss", "shadowsocks":
@@ -86,5 +85,5 @@ func Gen_URL(src *conf.OutboundDetourConfig) string {
 	case "trojan":
 		break;
 	}
-	return ""
+	return nil
 }

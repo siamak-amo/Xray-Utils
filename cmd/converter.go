@@ -64,3 +64,11 @@ func (opt Opt) CFG_Out(url string) (error) {
 	}
 	return nil
 }
+
+// URL generator
+func (opt Opt) Convert_conf2json() string {
+	if url := Gen_URL(opt.CFG); nil != url {
+		return url.String()
+	}
+	return ""
+}

@@ -193,7 +193,16 @@ func (opt Opt) Do() {
 			return;
 
 		case CMD_CONVERT_CFG:
-			log.Errorf("(%s) CMD_CONVERT_CFG -- Not Implemented.\n", ln);
+			opt.template_file = &ln
+			if e := opt.Init_CFG(); nil != e {
+				log.Errorf("Loading config failed - %v\n", e)
+				return;
+			}
+			if result := opt.Convert_conf2json(); "" != result {
+				println(result);
+			} else {
+				log.Errorf("Converting to URL failed.\n");
+			}
 			break;
 		}
 	}
