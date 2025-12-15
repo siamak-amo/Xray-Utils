@@ -16,8 +16,11 @@ func set_stream_tcp (args URLmap, dst *conf.StreamConfig) (error) {
 		return unmarshal_H (&dst.TCPSettings,
 			fmt.Sprintf (
 				`{
-                    "header": {"type": "%s"}, "request": {
-                      "version": "1.1", "path": ["%s"], "headers": {"Host": "%s"}
+                    "header": {
+                        "type": "%s",
+                        "request": {
+                            "version": "1.1", "path": ["%s"], "headers": {"Host": "%s"}
+                        }
                     }
                  }`,
 				args[TCP_HeaderType], args[TCP_HTTP_Path], args[TCP_HTTP_Host],
