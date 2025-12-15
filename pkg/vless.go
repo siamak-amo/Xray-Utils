@@ -6,6 +6,7 @@ import (
 	"strings"
 	"strconv"
 	"net/url"
+	"encoding/json"
 	"github.com/xtls/xray-core/infra/conf"
 )
 
@@ -47,10 +48,10 @@ func Gen_vless(args URLmap) (dst *conf.OutboundDetourConfig, e error) {
 func Gen_vless_URL(src *conf.OutboundDetourConfig) *url.URL {
 	var vless VLessVnext
 	u := &url.URL{ Scheme: "vless" };
-	if e := unmarshal_H (&vless, string(*src.Settings)); nil != e {
+	if e := json.Unmarshal (*src.Settings, &vless); nil != e {
 		return nil
 	}
-	if len(vless.Vnext) != 1  || len(vless.Vnext[0].Users) != 1 {
+	if len(vless.Vnext) == 0 || len(vless.Vnext[0].Users) == 0 {
 		return nil
 	}
 	vnext := vless.Vnext[0]
@@ -61,9 +62,8 @@ func Gen_vless_URL(src *conf.OutboundDetourConfig) *url.URL {
 	AddQuery (q, "level", strconv.Itoa(vnext.Users[0].Level))
 	AddQuery (q, "encryption", vnext.Users[0].Encryption)
 
-	var stream conf.StreamConfig
 	if nil != src.StreamSetting {
-		stream = *src.StreamSetting
+		stream := *src.StreamSetting
 
 		if nil != stream.Network {
 			net := string(*stream.Network)
@@ -86,6 +86,8 @@ func Gen_vless_URL(src *conf.OutboundDetourConfig) *url.URL {
 				AddQuery (q, "path", stream.WSSettings.Path)
 				break;
 			}
+		} else {
+			AddQuery (q, "type", "tcp")
 		}
 
 		sec := stream.Security
@@ -103,6 +105,7 @@ func Gen_vless_URL(src *conf.OutboundDetourConfig) *url.URL {
 			AddQuery (q, "pbk", stream.REALITYSettings.PublicKey)
 			AddQuery (q, "sid", stream.REALITYSettings.ShortId)
 			AddQuery (q, "sni", stream.REALITYSettings.ServerNames[0])
+			AddQuery (q, "mode", stream.REALITYSettings.Type)
 			break;
 		}
 	}
