@@ -49,6 +49,13 @@ func (umap URLmap) Assert (t *testing.T, id URLMapper, expected string) {
 	}
 }
 
+func Assert (t *testing.T, actual, expected string) {
+	if actual != expected {
+		printFailure (actual, expected)
+		t.Fail()
+	}
+}
+
 func (tc TestCase[T]) Assert (val interface{}, expected string) {
 	var value string
 	if i, ok := val.(int); ok {
@@ -111,8 +118,12 @@ type VLessAccount struct {
 }
 
 // Complete types to be used in testings
-type VLessCFG OutboundDetourConfig[VXessOutboundConfig[VXessOutboundVnext[VLessAccount]]]
-type VMessCFG OutboundDetourConfig[VXessOutboundConfig[VXessOutboundVnext[VMessAccount]]]
+type VLessVnext VXessOutboundConfig[VXessOutboundVnext[VLessAccount]]
+type VLessCFG OutboundDetourConfig[VLessVnext]
+
+type VmessVnext VXessOutboundConfig[VXessOutboundVnext[VMessAccount]]
+type VMessCFG OutboundDetourConfig[VmessVnext]
+
 type ServerCFG OutboundDetourConfig[ServerConfig[ShadojanServer]]
 
 type StreamConfig struct {
