@@ -144,7 +144,7 @@ func Test_Gen_vless_URL_4(t *testing.T) {
 	Assert (t, q.Get("security"), "none_sec");
 	Assert (t, q.Get("authority"), "abcd");
 	Assert (t, q.Get("serviceName"), "srv_name");
-	Assert (t, q.Get("multiMode"), "true");
+	Assert (t, q.Get("mode"), "multi");
 }
 
 // Vless over WS + Reality test
