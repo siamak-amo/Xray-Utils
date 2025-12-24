@@ -33,7 +33,7 @@ func (opt Opt) CFG_Out(url string) (error) {
 	var err error
 	var b []byte
 
-	if "" == *opt.output_dir {
+	if "" == opt.output_dir {
 		// Use the compact format for stdout
 		b, err = json.Marshal(opt.CFG)
 	} else {
@@ -43,7 +43,7 @@ func (opt Opt) CFG_Out(url string) (error) {
 		panic(err) // it's ours. we have generated opt.CFG wrong
 	}
 
-	if "" == *opt.output_dir {
+	if "" == opt.output_dir {
 		println(b);
 	} else {
 		// Write to file
@@ -61,7 +61,7 @@ func (opt Opt) CFG_Out(url string) (error) {
 			log.Errorf("Out failed to write: %v\n", err)
 			return err // fatal
 		}
-		log.Verbosef("Wrote: %s", path)
+		log.Verbosef("Wrote: %s\n", path)
 	}
 	return nil
 }

@@ -77,7 +77,7 @@ func (opt *Opt) Test_URL(url string) bool {
 }
 
 func (opt *Opt) Test_CFG(path string) bool {
-	opt.template_file = &path;
+	opt.template_file = path;
 	if e := opt.Init_CFG(); nil != e {
 		return false
 	}

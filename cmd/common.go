@@ -36,14 +36,14 @@ const (
 type Opt struct {
 	Cmd int // CMD_xxx
 	CFG *conf.Config
-	Verbose *bool
 
-	url *string
-	in_file *string // input URLs file path
-	configs *string // file or dir for testing
-	output_dir *string // output file(s) dir
-	template_file *string // template file path
-	rm *bool // remove files if broken or invalid
+	url string
+	configs string			// file or dir for testing
+	output_dir string		// output file(s) dir
+	template_file string	// template file path
+	in_file string			// input URLs file path
+	rm bool					// remove files if broken or invalid
+	verbose bool
 
 	scanner *bufio.Scanner
 	GetInput func() (string, bool)
@@ -55,7 +55,7 @@ type Opt struct {
 func (opt Opt) GetOutput_filepath(url []byte) string {
 	h := md5.New()
 	h.Write(url)
-	return filepath.Join (*opt.output_dir,
+	return filepath.Join (opt.output_dir,
 		fmt.Sprintf(
 			"config_%s.json",
 			hex.EncodeToString(h.Sum(nil))[0:16],
@@ -85,8 +85,8 @@ func GetFormatByExtension(filename string) string {
 // Applies the template opt.template_path to opt.CFG
 func (opt *Opt) Apply_template() error {
 	t := core.ConfigSource{
-		Name: *opt.template_file,
-		Format: GetFormatByExtension(*opt.template_file),
+		Name: opt.template_file,
+		Format: GetFormatByExtension(opt.template_file),
 	}
 	r, err := confloader.LoadConfig(t.Name)
 	if nil != err {
@@ -112,7 +112,7 @@ func (opt *Opt) Apply_Default_template() {
 //         opt.template_path == "-" means to read from stdin
 func (opt *Opt) Init_CFG() error {
 	var e error
-	if "-" == *opt.template_file {
+	if "-" == opt.template_file {
 		if term.IsTerminal (int(os.Stdin.Fd())) {
 			println ("Reading json config from STDIN until EOF:")
 		}
@@ -124,7 +124,7 @@ func (opt *Opt) Init_CFG() error {
 		return e;
 	}
 
-	if "" != *opt.template_file {
+	if "" != opt.template_file {
 		return opt.Apply_template()
 	} else {
 		opt.Apply_Default_template();
@@ -178,12 +178,12 @@ func PickPort() int {
 //////////////////////////////////////
 func (opt *Opt) Set_rd_url() {
 	opt.GetInput = func() (string, bool) {
-		return *opt.url, true
+		return opt.url, true
 	}
 }
 
 func (opt *Opt) Set_rd_file() error {
-	f, err := os.Open(*opt.in_file)
+	f, err := os.Open(opt.in_file)
 	if nil != err {
 		return err
 	}
@@ -219,7 +219,7 @@ func (opt *Opt) Set_rd_cfg_stdin() {
 }
 
 func (opt *Opt) Set_rd_cfg() {
-	fileInfo, err := os.Stat(*opt.configs);
+	fileInfo, err := os.Stat(opt.configs);
 	if nil != err {
 		log.Errorf("%v\n", err);
 		opt.GetInput = func() (string, bool) { return "", true; }
@@ -229,7 +229,7 @@ func (opt *Opt) Set_rd_cfg() {
 		// Find all .json files here
 		jsonFiles := []string{}
 		filepath.Walk(
-			*opt.configs,
+			opt.configs,
 			func(path string, info os.FileInfo, err error) error {
 				if err != nil {
 					return err
@@ -251,10 +251,10 @@ func (opt *Opt) Set_rd_cfg() {
 		}
 	} else {
 		opt.GetInput = func() (string, bool) {
-			if !strings.HasSuffix(*opt.configs, ".json") {
+			if !strings.HasSuffix(opt.configs, ".json") {
 				return "", true
 			}
-			return *opt.configs , true;
+			return opt.configs , true;
 		}
 	}
 }
