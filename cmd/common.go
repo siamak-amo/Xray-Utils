@@ -101,7 +101,12 @@ func (opt *Opt) Apply_template() error {
 	return nil
 }
 
-
+func (opt *Opt) Apply_Default_template() {
+	var e error
+	if opt.CFG, e = pkg.Gen_main(opt.Get_Default_Template()); nil != e {
+		panic(e) // it's ours. broken default template
+	}
+}
 
 // Applies opt.template_path  or  the default template
 //         opt.template_path == "-" means to read from stdin
@@ -122,10 +127,7 @@ func (opt *Opt) Init_CFG() error {
 	if "" != *opt.template_file {
 		return opt.Apply_template()
 	} else {
-		// Apply the default template
-		if opt.CFG, e = pkg.Gen_main(opt.Get_Default_Template()); nil != e {
-			panic(e) // it's ours. broken default template
-		}
+		opt.Apply_Default_template();
 	}
 	return nil
 }

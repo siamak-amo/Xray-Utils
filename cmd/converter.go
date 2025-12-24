@@ -14,7 +14,7 @@ import (
 func (opt Opt) Convert_url2json(url string) (error) {
 	var err error
 	if err = opt.Apply_template(); nil != err {
-		return err
+		opt.Apply_Default_template();
 	}
 	if err = opt.Init_Outbound_byURL(url); nil != err {
 		log.Errorf("Invalid or unsupported URL - %v\n", err)
