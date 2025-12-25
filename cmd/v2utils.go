@@ -27,14 +27,15 @@ import (
 const Version = "1.1";
 
 func (opt *Opt) GetArgs() {
-	const optstr = "u:f:t:o:c:rvh"
+	const optstr = "u:f:t:o:c:Rrvh"
 	lopts := []getopt.Option{
 		{"url",           true,  'u'},
 		{"config",        true,  'c'},
 		{"template",      true,  't'},
 		{"output",        true,  'o'},
 		{"input",         true,  'i'},
-		{"rm",            false, 'r'},
+		{"reverse",       false, 'r'},
+		{"rm",            false, 'R'},
 		{"verbose",       false, 'v'},
 		{"help",          false, 'h'},
 	}
@@ -53,8 +54,10 @@ func (opt *Opt) GetArgs() {
 			opt.in_file = getopt.Optarg; break;
 		case 'o':
 			opt.output_dir = getopt.Optarg; break;
-		case 'r':
+		case 'R':
 			opt.rm = true; break;
+		case 'r':
+			opt.reverse = true; break;
 		case 'v':
 			opt.verbose = true; break;
 		case 'h':
@@ -73,9 +76,11 @@ OPTIONS:
                           (for Run and Convert commands)
     -i, --input           path to input URL file
     -o, --output          path to output folder
-    -r, --rm              to remove broken config files
-                          (only in Test command)
     -v, --verbose         verbose
+
+Test command options:
+    -r, --reverse         only print broken configs on stdout
+    -R, --rm              to remove broken config files
 
 Examples:
     # run xray by URL:
@@ -147,6 +152,10 @@ func (opt *Opt) Init() int {
 		log.LogLevel = log.Verbose;
 	} else {
 		log.LogLevel = log.Warning; // Default level
+	}
+	if opt.rm && opt.reverse {
+		log.Errorf("cannot pass --rm and --reverse options together\n");
+		return -1
 	}
 
 	switch (opt.Cmd) {
@@ -223,36 +232,60 @@ func (opt Opt) Do() {
 			break;
 
 		case CMD_TEST:
-			if opt.Test_URL(ln) {
-				if opt.verbose {
-					log.Infof("`%s` OK.\n", ln)
+			b := opt.Test_URL(ln)
+			if ! opt.reverse {
+				if b {
+					if opt.verbose {
+						log.Infof("`%s` OK.\n", ln)
+					} else {
+						fmt.Println(ln)
+					}
 				} else {
-					fmt.Println(ln)
+					log.Infof("Broken URL '%s'\n", ln);
 				}
-				if "" != opt.output_dir {
-					opt.CFG_Out(ln); // Also generate json files
+			} else { // Only print broken urls
+				if ! b {
+					fmt.Println(ln);
+				} else if opt.verbose {
+					log.Infof("`%s` OK.\n", ln)
 				}
-			} else {
-				log.Infof("Broken URL '%s'\n", ln);
+			}
+			// Generating json files if appropriate
+			if b && "" != opt.output_dir {
+				opt.CFG_Out(ln);
 			}
 			break;
 
 			// For xxx_CFG commands, @ln is path to a file or `-` for stdin
 		case CMD_TEST_CFG:
-			if opt.Test_CFG(ln) {
+			b := opt.Test_CFG(ln)
+			if ! opt.reverse {
 				if opt.verbose {
-					fmt.Printf("config file `%s':  OK.\n", ln)
-				} else {
-					fmt.Println(ln);
-				}
-			} else {
-				if opt.rm {
-					fmt.Printf("Broken file %s was removed.\n", ln)
-					if e := os.Remove(ln); nil != e {
-						log.Errorf("Could not remove %s - %v\n", ln, e)
+					if b {
+						log.Logf("config file '%s':  OK.\n", ln)
+					} else {
+						log.Logf("config file '%s':  Broken.\n", ln, b)
 					}
 				} else {
-					log.Infof("Broken config file %s\n", ln)
+					if b {
+						fmt.Println(ln);
+					} else {
+						log.Infof("Broken config file %s\n", ln)
+					}
+				}
+			} else { // Only print broken configs
+				if ! b {
+					fmt.Println(ln);
+				} else {
+					log.Infof("config file '%s':  OK.\n", ln)
+				}
+			}
+
+			if ! b && opt.rm { // We are not in reverse mode here
+				if e := os.Remove(ln); nil != e {
+					log.Errorf("Could not remove %s - %v\n", ln, e)
+				} else {
+					log.Logf("Broken file %s was removed.\n", ln)
 				}
 			}
 			break;

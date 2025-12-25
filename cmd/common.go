@@ -43,6 +43,7 @@ type Opt struct {
 	template_file string	// template file path
 	in_file string			// input URLs file path
 	rm bool					// remove files if broken or invalid
+	reverse bool            // print broken configs, not functionals
 	verbose bool
 
 	scanner *bufio.Scanner

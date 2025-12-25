@@ -20,6 +20,11 @@ func Must(level int) bool {
 		(None != LogLevel  &&  level >= LogLevel);
 }
 
+// bypass the level, always print the log
+func Logf(format string, args ...interface{}) {
+	MiniFlogf (os.Stderr, format, args...)
+}
+
 func Verbosef(format string, args ...interface{}) {
 	if (Verbose == LogLevel) {
 		MiniFlogf (os.Stderr, format, args...)
