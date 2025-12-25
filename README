@@ -1,0 +1,98 @@
+V2utils (Xray utility)
+======================
+
+This project provides a simple command-line tool, that extends
+the xray-core program at <https://github.com/xtls/xray-core>.
+
+Quick introduction
+------------------
+
+Many web interfaces (v2ray panels) are available and used for
+managing and configuring V2ray/Xray servers. These interfaces
+often generate URLs to configure the client-side programs.
+
+Although these URLs (e.g. vless://id@host:ip) are commonly
+used, they are not supported by traditional command-line
+Xray and V2ray programs; only mobile and GUI applications
+like v2rayNG on Android, and v2rayN support them.
+
+This project extends the xray-core command-line program
+to support proxy URLs, providing functionalities to directly
+use, test and convert them.
+
+Build / Install
+---------------
+
+* To build from source:
+  Simply run `make` at the root of the project.
+  Also `make debug` builds with additional debug logging.
+
+* To Install via go command:
+  `go install -v github.com/siamak-amo/v2utils/cmd@latest`
+
+
+Usage examples
+==============
+
+V2utils supports three major functionalities: Convert, Test and Run.
+
+As a common convention, all commands:
+ - Use stdin if no --url option is provided.
+ - Use stdout if no --output option is provided.
+ - Read all json files from a directory, if the --config option
+   points to a directory rather than an explicit file path.
+
+See `v2utils -h` for a detailed help.
+
+
+Convert command
+---------------
+
+The Convert command, converts proxy URLs to their equivalent json
+format using a base template specified by the --template option.
+It can also convert 'outbounds' section of the json files back
+into V2rayNG compatible URLs.
+
+* Converting proxy URLs to json
+  $ v2utils convert --output /path/to/destination_dir \
+                       --url 'vless://id@1.2.3.4:1234/?type=tcp' \
+                  --template template.json
+
+  Where the template.json file would look like:
+  {
+      "log": {"loglevel": "error"},
+      "inbounds": [
+          {"listen": "127.0.0.1", "port": 8080, "protocol": "http"}
+      ],
+      "routing": {}
+  }
+
+* Converting 'outbounds' of json files to URL:
+  $ v2utils convert --config /path/to/conf_dir
+
+Test command
+------------
+
+The Test command determines broken and functional configurations
+by verifying the accessibility of 'http://google.com' through
+the VPN client with the current configuration.
+
+* Test URLs and collect only working ones:
+  $ cat urls.txt  |  v2utils test  >  urls.working.txt
+
+* Test json file(s):
+  $ v2utils test --config /path/to/config_dir
+  To also delete broken files, pass --rm
+
+Run command
+-----------
+
+The Run command executes an Xray instance using the provided
+URL and template  or  with config file.
+
+* Run with URL:
+  To run with a URL, use the --url option for 'outbounds', along
+  with a template.json file for 'inbounds', 'routing', 'logs', etc.
+
+  $ v2utils run --url vless://id@1.2.3.4:1234 \
+           --template template.json
