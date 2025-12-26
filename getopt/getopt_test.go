@@ -105,3 +105,24 @@ func Test_getopt_nonsexist_opt(t *testing.T) {
 	}
 	tcase.Test(t);
 }
+
+// Dash as argument
+func Test_getopt_dash(t *testing.T) {
+	tcase := Test_case{
+		cfg_optstr: "x:hX:",
+		cfg_longopt:  []Option{
+			{"value",      true,  'x'},
+			{"method",     true,  'X'},
+			{"help",       false, 'h'},
+		},
+		argv: []string{
+			"a.out",   "-x", "-",   "-x-",   "--method",  "-",
+		},
+		exps: []Expectation{
+			{'x', "-"}, // normal `-x -`
+			{'x', "-"}, // GNU style `-x-`
+			{'X', "-"}, // long `--method -`
+		},
+	}
+	tcase.Test(t);
+}

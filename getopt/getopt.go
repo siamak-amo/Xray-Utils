@@ -38,6 +38,25 @@ func errlog(format string, args ...any) {
 	}
 }
 
+func is_opt(s string) bool {
+	len := len(s)
+	if len == 0 || len == 1 {
+		return false;
+	}
+	if s[0] == '-' {
+		if s[1] != '-' {
+			return true;
+		} else {
+			if len > 2 {
+				return false;
+			} else {
+				return true; // consider -- is an option
+			}
+		}
+	}
+	return false;
+}
+
 func Getopt_long(argv []string, optstring string, longopts []Option) int {
 beginning_of_parse:
 	if Optind >= len(argv) {
@@ -56,7 +75,7 @@ beginning_of_parse:
 			if idx+1 < len(optstring) && optstring[idx+1] == ':' { // accepts arg
 				if len(arg) == 2 {  // -x
 					Optind += 1
-					if Optind < len(argv) && argv[Optind][0] != '-' {
+					if Optind < len(argv) && !is_opt(argv[Optind]) {
 						Optarg = argv[Optind]
 						Optind += 1
 					} else {
@@ -94,7 +113,7 @@ beginning_of_parse:
 			if arg[2:] == v.Name { // found
 				Optopt = v.Value
 				Optind += 1
-				if v.HasArg && Optind < len(argv) && argv[Optind][0] != '-' {
+				if v.HasArg && Optind < len(argv) && !is_opt(argv[Optind]) {
 					Optarg = argv[Optind]
 					Optind += 1
 				} else if v.HasArg {
