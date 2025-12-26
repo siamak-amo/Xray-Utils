@@ -57,13 +57,11 @@ func (opt Opt) gen_output_filepath(url []byte) string {
 // Applies opt.template_path  or  the default template
 //         opt.template_path == "-" means to read from stdin
 func (opt *Opt) Init_CFG() error {
-	var e error
 	if "-" == opt.template_file {
 		if Isatty(os.Stdin) {
 			println ("Reading json config from STDIN until EOF:")
 		}
-		e = opt.V2.Apply_template_byio (os.Stdin);
-		return e;
+		return opt.V2.Apply_template_byio (os.Stdin);
 	} else {
 		if "" != opt.template_file {
 			return opt.V2.Apply_template (opt.template_file)

@@ -4,7 +4,6 @@ package utils
 import (
 	"io"
 	"strings"
-	"io/ioutil"
 
 	pkg "github.com/siamak-amo/v2utils/pkg"
 
@@ -69,10 +68,7 @@ func (v2 *V2utils) Apply_template_bystr(template string) error {
 }
 
 func (v2 *V2utils) Apply_template_byio(rio io.Reader) error {
-	res, err := ioutil.ReadAll(rio)
-	if nil != err {
-		return err
-	}
-	v2.CFG, err = pkg.Gen_main(string (res));
+	var err error
+	v2.CFG, err = pkg.Gen_main_io(rio);
 	return err;
 }

@@ -2,6 +2,7 @@
 package pkg
 
 import (
+	"io"
 	"errors"
 	"strings"
 	"net/url"
@@ -54,11 +55,18 @@ const (
 	Trojan_Password
 )
 
-func unmarshal_H (t interface{}, input string) (error) {
-	err := json.Unmarshal ([]byte(input), t)
+func unmarshal_H (dst interface{}, input string) (error) {
+	err := json.Unmarshal ([]byte(input), dst)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+func unmarshal_HIO (dst interface{}, input io.Reader) (error) {
+	decoder := json.NewDecoder(input)
+    if err := decoder.Decode(dst); err != nil {
+        return err
+    }
 	return nil
 }
 

@@ -2,6 +2,7 @@
 package pkg
 
 import (
+	"io"
 	"net/url"
 	log "github.com/siamak-amo/v2utils/log"
 	"github.com/xtls/xray-core/infra/conf"
@@ -11,6 +12,13 @@ import (
 func Gen_main(input string) (dst *conf.Config, e error) {
 	dst = &conf.Config{}
 	if e = unmarshal_H (dst, input); nil != e {
+		// log
+	}
+	return
+}
+func Gen_main_io(input io.Reader) (dst *conf.Config, e error) {
+	dst = &conf.Config{}
+	if e = unmarshal_HIO (dst, input); nil != e {
 		// log
 	}
 	return
