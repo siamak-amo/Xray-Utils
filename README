@@ -35,8 +35,11 @@ Usage examples
 ==============
 
 V2utils supports three major functionalities: Convert, Test and Run.
+Run v2utils like: `v2utils COMMAND` or create soft links for each
+functionality: v2convert, v2test, and v2run.
 
 As a common convention, all commands:
+ - Use stderr for verbose
  - Use stdin if no --url option is provided.
  - Use stdout if no --output option is provided.
  - Read all json files from a directory, if the --config option

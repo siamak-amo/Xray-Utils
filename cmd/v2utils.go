@@ -19,6 +19,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"strings"
 
 	log "github.com/siamak-amo/v2utils/log"
 	getopt "github.com/siamak-amo/v2utils/getopt"
@@ -100,48 +101,64 @@ Examples:
 	}
 }
 
+func (opt *Opt) Set2_convert() int {
+	if "" != opt.configs {
+		opt.Cmd = CMD_CONVERT_CFG;
+	} else {
+		// Default: converting URLs (stdin / --url)
+		opt.Cmd = CMD_CONVERT;
+	}
+	return 0;
+}
+func (opt *Opt) Set2_test() int {
+	if "" != opt.configs {
+		// For Testing config (.json) files
+		opt.Cmd = CMD_TEST_CFG;
+	} else {
+		// Default: testing URLs
+		opt.Cmd = CMD_TEST;
+	}
+	return 0;
+}
+func (opt *Opt) Set2_run() int {
+	if "" != opt.configs {
+		opt.Cmd = CMD_RUN_CFG;
+	} else if "" != opt.url {
+		opt.Cmd = CMD_RUN;
+	} else {
+		log.Errorf("Run command needs a URL (--url) or config file (--config).");
+		return -1
+	}
+	return 0;
+}
+
 // returns negative on fatal failures
 func (opt *Opt) HandleArgs() int {
 	argv := os.Args
-	if len(argv) < 2 {
-		fmt.Fprintln(os.Stderr, "error:  missing COMMAND")
-		fmt.Fprintln(os.Stderr, "usage:  v2utils [COMMAND] [OPTIONS]")
-		return -1
-	}
-	switch (argv[1]) {
-	case "convert","CONVERT", "conv", "c","C":
-		if "" != opt.configs {
-			opt.Cmd = CMD_CONVERT_CFG;
-		} else {
-			// Default: converting URLs (stdin / --url)
-			opt.Cmd = CMD_CONVERT;
-		}
-		break;
-
-	case "test","Test","TEST", "t","T":
-		if "" != opt.configs {
-			// For Testing config (.json) files
-			opt.Cmd = CMD_TEST_CFG;
-		} else {
-			// Default: testing URLs
-			opt.Cmd = CMD_TEST;
-		}
-		break;
-
-	case "run","Run","RUN", "r","R":
-		if "" != opt.configs {
-			opt.Cmd = CMD_RUN_CFG;
-		} else if "" != opt.url {
-			opt.Cmd = CMD_RUN;
-		} else {
-			log.Errorf("Run command needs a URL (--url) or config file (--config).");
+	switch (argv[0][strings.LastIndexByte(argv[0], '/')+1:]) {
+	case "v2test":
+		return opt.Set2_test();
+	case "v2convert", "v2conv":
+		return opt.Set2_convert();
+	case "v2run", "v2ray", "xray", "xrun":
+		return opt.Set2_run();
+	default:
+		if len(argv) < 2 {
+			fmt.Fprintln(os.Stderr, "error:  missing COMMAND")
+			fmt.Fprintln(os.Stderr, "usage:  v2utils [COMMAND] [OPTIONS]")
 			return -1
 		}
-		break;
-
-	default:
-		println ("Invalid command.");
-		return -1
+		switch (argv[1]) {
+		case "convert","CONVERT", "conv", "c","C":
+			return opt.Set2_convert();
+		case "test","Test","TEST", "t","T":
+			return opt.Set2_test();
+		case "run","Run","RUN", "r","R":
+			return opt.Set2_run();
+		default:
+			println ("Invalid command.");
+			return -1
+		}
 	}
 	return 0;
 }
