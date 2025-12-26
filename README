@@ -39,13 +39,11 @@ Run v2utils like: `v2utils COMMAND` or create soft links for each
 functionality: v2convert, v2test, and v2run.
 
 As a common convention, all commands:
- - Use stderr for verbose
+ - Use stdin if a dash is passed as argument to --config, --url.
  - Use stdin if no --url option is provided.
  - Use stdout if no --output option is provided.
  - Read all json files from a directory, if the --config option
    points to a directory rather than an explicit file path.
-
-See `v2utils -h` for a detailed help.
 
 
 Convert command
@@ -80,10 +78,13 @@ The Test command determines broken and functional configurations
 by verifying the accessibility of 'http://google.com' through
 the VPN client with the current configuration.
 
-* Test URLs and collect only working ones:
+* Test URLs and collect only functional ones:
   $ cat urls.txt  |  v2utils test  >  urls.working.txt
 
-* Test json file(s):
+* Test and create equivalent json file for functional URLs:
+  $ cat urls.txt  |  v2utils test --output /path/to/dst_dir
+
+* Test json files:
   $ v2utils test --config /path/to/config_dir
   To also delete broken files, pass --rm
 
@@ -108,3 +109,12 @@ URL and template  or  with config file.
 
   $ v2utils run --url vless://id@1.2.3.4:1234 \
            --template template.json
+
+
+Source code
+===========
+
+ - cmd: Dedicated to the command-line interface.
+ - pkg: Contains low-level functions for converting URLs <-> JSON.
+ - utils: Interface to pkg, It also provides running and testing
+          Xray-core functions. It should be reusable as a library.
