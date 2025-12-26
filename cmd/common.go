@@ -86,9 +86,11 @@ func (opt *Opt) Get_Default_Template() string {
 	return "";
 }
 
-func (opt Opt) MK_josn_output(url string) {
+func (opt Opt) MK_josn_output(url string) error {
 	if "" == opt.output_dir {
-		opt.V2.CFG_Out(os.Stdout, !Isatty(os.Stdout)); // no indent for tty's
+		if err := opt.V2.CFG_Out(os.Stdout, !Isatty(os.Stdout)); nil != err {
+			return err;
+		}
 	} else {
 		// Write to file
 		path := opt.gen_output_filepath([]byte(url))
@@ -97,17 +99,16 @@ func (opt Opt) MK_josn_output(url string) {
 			os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644,
 		);
 		if err != nil {
-			log.Errorf("File error - %v\n", err)
-			return
+			return err
 		}
 		defer of.Close()
 		if err := opt.V2.CFG_Out(of, true); nil != err {
-			log.Errorf("Write error - %v\n", err)
-			return
+			return err
 		} else {
 			log.Verbosef("Wrote: %s\n", path)
 		}
 	}
+	return nil;
 }
 
 func (opt Opt) Test_URL(url string) bool {

@@ -215,8 +215,15 @@ func (opt Opt) Do() {
 					panic(e); // it's ours, the default template is broken
 				}
 			}
-			opt.V2.Apply_URL(ln);
-			opt.MK_josn_output(ln);
+			if e := opt.V2.Apply_URL(ln); nil != e {
+				log.Warnf("Could not apply URL '%s' - %v\n", ln, e);
+				continue;
+			}
+			if e := opt.MK_josn_output(ln); nil != e {
+				log.Errorf("IO error: %v\n", e);
+				log.Errorf("Fatal error, exiting.\n");
+				return;
+			}
 			break;
 
 		case CMD_RUN:
@@ -259,7 +266,11 @@ func (opt Opt) Do() {
 			}
 			// Generating json files if appropriate
 			if b && "" != opt.output_dir {
-				opt.MK_josn_output(ln);
+				if e := opt.MK_josn_output(ln); nil != e {
+					log.Errorf("IO error: %v\n", e);
+					log.Errorf("Fatal error, exiting.\n");
+					return;
+				}
 			}
 			break;
 
