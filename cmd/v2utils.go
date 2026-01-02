@@ -27,6 +27,33 @@ import (
 
 const Version = "1.2";
 
+const (
+	CMD_CONVERT_URL int = iota
+	CMD_CONVERT_CFG
+	CMD_TEST_URL
+	CMD_TEST_CFG
+	CMD_RUN_URL
+	CMD_RUN_CFG
+) // commands
+
+type Opt struct {
+	// User options
+	Cmd int                 // CMD_xxx
+	url string
+	configs string			// file or dir for testing
+	output_dir string		// output dir
+	template_file string	// template file path
+	in_file string			// input URLs file path
+	rm bool					// remove files if broken or invalid
+	reverse bool            // print broken configs, not functionals
+	verbose bool
+
+	scanner *bufio.Scanner
+	GetInput func() (string, bool)
+
+	V2 utils.V2utils
+};
+
 func (opt *Opt) GetArgs() {
 	const optstr = "u:f:t:o:c:Rrvh"
 	lopts := []getopt.Option{
@@ -279,7 +306,7 @@ func (opt Opt) Do() {
 					log.Infof("`%s` OK.\n", ln)
 				}
 			}
-			// Generating json files if appropriate
+			// Generating json files if applicable
 			if b && "" != opt.output_dir {
 				if e := opt.MK_josn_output(ln); nil != e {
 					log.Errorf("IO error: %v\n", e);

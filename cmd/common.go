@@ -14,33 +14,6 @@ import (
 	utils "github.com/siamak-amo/v2utils/utils"	
 )
 
-const (
-	CMD_CONVERT_URL int = iota
-	CMD_CONVERT_CFG
-	CMD_TEST_URL
-	CMD_TEST_CFG
-	CMD_RUN_URL
-	CMD_RUN_CFG
-) // commands
-
-type Opt struct {
-	// User options
-	Cmd int                 // CMD_xxx
-	url string
-	configs string			// file or dir for testing
-	output_dir string		// output file(s) dir
-	template_file string	// template file path
-	in_file string			// input URLs file path
-	rm bool					// remove files if broken or invalid
-	reverse bool            // print broken configs, not functionals
-	verbose bool
-
-	scanner *bufio.Scanner
-	GetInput func() (string, bool)
-
-	V2 utils.V2utils
-};
-
 var (
 	Supported_CFG_Formats = []string{".json", ".toml", ".yaml"}
 )
