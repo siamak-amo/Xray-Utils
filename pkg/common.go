@@ -46,6 +46,10 @@ const (
 	GRPC_ServiceName
 	KCP_SEED                // KCP (MKCP)
 	KCP_HType
+	XHTTP_Host              // xhttp
+	XHTTP_Path
+	XHTTP_Mode
+	XHTTP_Headers // Comma-separated values, no double quote
 	// Protocol parts
 	Vxess_ID  // vless & vmess  we call them vxess
 	Vless_ENC

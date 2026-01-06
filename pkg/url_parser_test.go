@@ -115,6 +115,19 @@ func Test_parse_vless_url_6 (t *testing.T) {
 	umap.Assert (t, KCP_HType,          "srtp")
 }
 
+// Xhttp test
+func Test_parse_vless_url_7 (t *testing.T) {
+	const VLESS_TEST_5 = "vless://4de73a98-0f31@2.2.22.222:4000?mode=auto&path=%2F%40zzz&security=reality&encryption=none&pbk=WvWpvjm&fp=chrome&spx=%2F&type=xhttp&sni=zuzula.ir&sid=d9ed58fe&host=meme.global.ssl.fastly.net"
+	umap, e := ParseURL(VLESS_TEST_5);
+	if nil != e {
+		t.Fatalf ("parse_vless_url failed: %v\n", e)
+	}
+
+	umap.Assert (t, Network,			"xhttp")
+	umap.Assert (t, XHTTP_Host,			"meme.global.ssl.fastly.net")
+	umap.Assert (t, XHTTP_Path,          "/@zzz")
+}
+
 // Simple vmess test
 func Test_parse_vmess_url_1 (t *testing.T) {
 	const VMESS_TEST_1 = "vmess://eyJhZGQiOiJzZWxsdmlwdnBuLm15aXJhbjEucHciLCJhaWQiOiIwIiwiaG9zdCI6InNuYXBwLmlyIiwiaWQiOiIwZDBjZTMwMC03NDg5LTRiNmMtYmM1YS00YWYzYTU2OTRjMGMiLCJuZXQiOiJ0Y3AiLCJwYXRoIjoiLyIsInBvcnQiOiIyMDg3IiwicHMiOiJ0ZXN0MUBzZWxsX3ZpcHZwbiIsInNjeSI6ImF1dG8iLCJzbmkiOiIiLCJ0bHMiOiIiLCJ0eXBlIjoiaHR0cCIsInYiOiIyIn0="

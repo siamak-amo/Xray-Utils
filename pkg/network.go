@@ -60,6 +60,15 @@ func set_stream_grpc (args URLmap, dst *conf.StreamConfig) (error) {
 	);
 }
 
+func set_stream_xhttp (args URLmap, dst *conf.StreamConfig) (error) {
+	args[XHTTP_Headers] = csv2jsonArray (args[XHTTP_Headers]);
+	return unmarshal_H (&dst.SplitHTTPSettings,
+		fmt.Sprintf (`{"host": "%s", "path": "%s", "mode": "%s", "headers": [%s]}`,
+			args[XHTTP_Host], args[XHTTP_Path], args[XHTTP_Mode], args[XHTTP_Headers],
+		),
+	);
+}
+
 func set_sec_tls (args URLmap, dst *conf.StreamConfig) (error) {
 	args[TLS_ALPN] = csv2jsonArray (args[TLS_ALPN]);
 	return unmarshal_H (&dst.TLSSettings,
@@ -95,6 +104,9 @@ func set_stream_settings(args URLmap, dst *conf.StreamConfig) (e error) {
 	case "grpc":
 		map_normal (args, GRPC_MultiMode, "false")
 		e = set_stream_grpc (args, dst)
+		break;
+	case "xhttp":
+		e = set_stream_xhttp (args, dst)
 		break;
 	default:
 		return not_implemented ("network " + args[Network])
@@ -225,6 +237,11 @@ func __set_kv_stream_vless_trojan(src *conf.StreamConfig, dst url.Values) {
 			case "ws":
 				AddQuery (dst, "host", src.WSSettings.Host)
 				AddQuery (dst, "path", src.WSSettings.Path)
+				break;
+			case "xhttp":
+				AddQuery (dst, "host", src.XHTTPSettings.Host)
+				AddQuery (dst, "mode", src.XHTTPSettings.Mode)
+				AddQuery (dst, "path", src.XHTTPSettings.Path)
 				break;
 			}
 		} else {

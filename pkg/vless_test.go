@@ -195,3 +195,25 @@ func Test_Gen_vless_URL_6(t *testing.T) {
 	Assert (t, q.Get("path"), "p@ssw0rd");
 	Assert (t, q.Get("headerType"), "utp");
 }
+
+// Vless over XHTTP
+func Test_Gen_vless_URL_7(t *testing.T) {
+	cfg := &conf.OutboundDetourConfig{ Protocol: "vless" }
+	if e := unmarshal_H (cfg, fmt.Sprintf(FMT_Vless,
+		`"network": "xhttp", "security": "none", "xhttpSettings": {
+             "host": "x.com", "path": "/xpath"
+         }`),
+	); nil != e {
+		panic (e);
+	}
+	u := Gen_vless_URL (cfg);
+	if nil == u {
+		t.Fatal("failed")
+	}
+
+	q := u.Query()
+	Assert (t, q.Get("type"), "xhttp");
+	Assert (t, q.Get("security"), "none");
+	Assert (t, q.Get("path"), "/xpath");
+	Assert (t, q.Get("host"), "x.com");
+}

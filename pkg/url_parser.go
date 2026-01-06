@@ -68,6 +68,13 @@ func parse_vless_url (u *url.URL) (URLmap) {
 		res[GRPC_MultiMode] = params.Pop ("multiMode")
 		res[GRPC_ServiceName] = params.Pop ("serviceName")
 		break;
+
+	case "xhttp", "splithttp":
+		res[XHTTP_Path] = params.Pop ("path")
+		res[XHTTP_Mode] = params.Pop ("mode")
+		res[XHTTP_Host] = params.Pop ("host")
+		break;
+
 	default:
 		break;
 	}
@@ -136,6 +143,13 @@ func parse_vmess_url (input string) (URLmap, error) {
 		// TODO: WS_Headers
 		res[WS_Path] = dst.Pop ("path")
 		res[WS_Host] = dst.Pop ("host")
+		break;
+
+	case "xhttp", "splithttp":
+		// TODO: XHTTP_Headers
+		res[XHTTP_Host] = dst.Pop ("host")
+		res[XHTTP_Path] = dst.Pop ("path")
+		res[XHTTP_Mode] = dst.Pop ("mode")
 		break;
 
 	default:
@@ -208,6 +222,15 @@ func parse_trojan_url (u *url.URL) (URLmap) {
 		res[GRPC_Mode] = params.Pop ("mode")
 		res[GRPC_MultiMode] = params.Pop ("multiMode")
 		res[GRPC_ServiceName] = params.Pop ("serviceName")
+		break;
+	case "kcp", "mkcp":
+		res[KCP_SEED] = params.Pop ("path");
+		res[KCP_HType] = params.Pop ("headerType");
+		break;
+	case "xhttp", "splithttp":
+		res[XHTTP_Path] = params.Pop ("path")
+		res[XHTTP_Mode] = params.Pop ("mode")
+		res[XHTTP_Host] = params.Pop ("host")
 		break;
 	default:
 		break;
