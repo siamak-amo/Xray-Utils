@@ -98,7 +98,6 @@ func Test_Gen_vless_URL_2(t *testing.T) {
 
 // Advanced vless TCP test
 func Test_Gen_vless_URL_3(t *testing.T) {
-	// Testing tcp settings
 	cfg := &conf.OutboundDetourConfig{ Protocol: "vless" }
 	if e := unmarshal_H (cfg, fmt.Sprintf(FMT_Vless,
 		`"network": "tcp", "security": "none", "tcpSettings": {
@@ -125,7 +124,6 @@ func Test_Gen_vless_URL_3(t *testing.T) {
 
 // Vless over GRPC test
 func Test_Gen_vless_URL_4(t *testing.T) {
-	// Testing tcp settings
 	cfg := &conf.OutboundDetourConfig{ Protocol: "vless" }
 	if e := unmarshal_H (cfg, fmt.Sprintf(FMT_Vless,
 		`"network": "grpc", "security": "none_sec", "grpcSettings": {
@@ -149,7 +147,6 @@ func Test_Gen_vless_URL_4(t *testing.T) {
 
 // Vless over WS + Reality test
 func Test_Gen_vless_URL_5(t *testing.T) {
-	// Testing tcp settings
 	cfg := &conf.OutboundDetourConfig{ Protocol: "vless" }
 	if e := unmarshal_H (cfg, fmt.Sprintf(FMT_Vless,
 		`"network": "ws", "security": "reality",
@@ -175,4 +172,26 @@ func Test_Gen_vless_URL_5(t *testing.T) {
 	Assert (t, q.Get("pbk"), "public.key");
 	Assert (t, q.Get("sid"), "shortID");
 	Assert (t, q.Get("spx"), "/test/spider");
+}
+
+// Vless over KCP
+func Test_Gen_vless_URL_6(t *testing.T) {
+		cfg := &conf.OutboundDetourConfig{ Protocol: "vless" }
+	if e := unmarshal_H (cfg, fmt.Sprintf(FMT_Vless,
+		`"network": "kcp", "security": "none", "kcpSettings": {
+             "seed": "p@ssw0rd", "header": {"type": "utp"}
+         }`),
+	); nil != e {
+		panic (e);
+	}
+	u := Gen_vless_URL (cfg);
+	if nil == u {
+		t.Fatal("failed")
+	}
+
+	q := u.Query()
+	Assert (t, q.Get("type"), "kcp");
+	Assert (t, q.Get("security"), "none");
+	Assert (t, q.Get("path"), "p@ssw0rd");
+	Assert (t, q.Get("headerType"), "utp");
 }

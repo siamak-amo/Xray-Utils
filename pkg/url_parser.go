@@ -58,6 +58,11 @@ func parse_vless_url (u *url.URL) (URLmap) {
 		res[TCP_HeaderType] = params.Pop ("headerType")
 		break;
 
+	case "kcp", "mkcp":
+		res[KCP_SEED] = params.Pop ("path");
+		res[KCP_HType] = params.Pop ("headerType");
+		break;
+
 	case "grpc":
 		res[GRPC_Mode] = params.Pop ("mode")
 		res[GRPC_MultiMode] = params.Pop ("multiMode")

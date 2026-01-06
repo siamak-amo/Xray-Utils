@@ -102,6 +102,19 @@ func Test_parse_vless_url_5 (t *testing.T) {
 	umap.Assert (t, REALITY_PublicKey,	"z1tAnqd5RA4I99LrK5FCJgjCd")
 }
 
+// KCP test
+func Test_parse_vless_url_6 (t *testing.T) {
+	const VLESS_TEST_4 = "vless://eb3fdd8f@config4vpn.fun:2053?type=mkcp&path=sec_password&headerType=srtp"
+	umap, e := ParseURL(VLESS_TEST_4);
+	if nil != e {
+		t.Fatalf ("parse_vless_url failed: %v\n", e)
+	}
+
+	umap.Assert (t, Network,			"mkcp")
+	umap.Assert (t, KCP_SEED,			"sec_password")
+	umap.Assert (t, KCP_HType,          "srtp")
+}
+
 // Simple vmess test
 func Test_parse_vmess_url_1 (t *testing.T) {
 	const VMESS_TEST_1 = "vmess://eyJhZGQiOiJzZWxsdmlwdnBuLm15aXJhbjEucHciLCJhaWQiOiIwIiwiaG9zdCI6InNuYXBwLmlyIiwiaWQiOiIwZDBjZTMwMC03NDg5LTRiNmMtYmM1YS00YWYzYTU2OTRjMGMiLCJuZXQiOiJ0Y3AiLCJwYXRoIjoiLyIsInBvcnQiOiIyMDg3IiwicHMiOiJ0ZXN0MUBzZWxsX3ZpcHZwbiIsInNjeSI6ImF1dG8iLCJzbmkiOiIiLCJ0bHMiOiIiLCJ0eXBlIjoiaHR0cCIsInYiOiIyIn0="

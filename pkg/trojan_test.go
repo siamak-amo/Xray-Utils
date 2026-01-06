@@ -169,3 +169,26 @@ func TestGen_trojan_5 (t *testing.T) {
 	Assert (t, q.Get("path"), "/test/");
 	Assert (t, q.Get("host"), "x.com");
 }
+
+// KCP test
+func TestGen_trojan_6 (t *testing.T) {
+	cfg := &conf.OutboundDetourConfig{ Protocol: "trojan" }
+	if e := unmarshal_H (cfg, fmt.Sprintf(FMT_ss,
+		`"network": "mkcp", "security": "none_sec",
+         "kcpSettings": {
+             "seed": "passwd", "header": {"type": "wireguard"}
+         }`,
+	)); nil != e {
+		panic (e);
+	}
+	u := Gen_trojan_URL (cfg);
+	if nil == u {
+		t.Fatal("failed")
+	}
+
+	q := u.Query()
+	Assert (t, q.Get("type"), "mkcp");
+	Assert (t, q.Get("security"), "none_sec");	
+	Assert (t, q.Get("path"), "passwd");
+	Assert (t, q.Get("headerType"), "wireguard");
+}

@@ -46,6 +46,13 @@ func set_stream_ws (args URLmap, dst *conf.StreamConfig) (error) {
 	);
 }
 
+func set_stream_kcp (args URLmap, dst *conf.StreamConfig) (error) {
+	return unmarshal_H (&dst.KCPSettings,
+		fmt.Sprintf (`{"seed": "%s", "header": {"type": "%s"}}`,
+			args[KCP_SEED], args[KCP_HType]),
+	);
+}
+
 func set_stream_grpc (args URLmap, dst *conf.StreamConfig) (error) {
 	return unmarshal_H (&dst.GRPCSettings,
 		fmt.Sprintf (`{"serviceName": "%s", "multiMode": %s, "mode": "%s"}`,
@@ -81,6 +88,9 @@ func set_stream_settings(args URLmap, dst *conf.StreamConfig) (e error) {
 		break;
 	case "tcp":
 		e = set_stream_tcp (args, dst);
+		break;
+	case "kcp", "mkcp":
+		e = set_stream_kcp (args, dst);
 		break;
 	case "grpc":
 		map_normal (args, GRPC_MultiMode, "false")
@@ -151,6 +161,9 @@ type TCPHeaderConfig struct {
 		Headers map[string]string	`json:"headers"`
 	}
 }
+type KCPHeaderConfig struct {
+	Type string					    `json:"type"`
+}
 
 func encode_tcp_header(src []byte) (TCPHeaderConfig, error) {
 	v := TCPHeaderConfig{}
@@ -160,6 +173,13 @@ func encode_tcp_header(src []byte) (TCPHeaderConfig, error) {
 	return v,nil
 }
 
+func encode_kcp_header(src []byte) (KCPHeaderConfig, error) {
+	v := KCPHeaderConfig{}
+	if e := json.Unmarshal(src, &v); nil != e {
+		return v,e
+	}
+	return v,nil
+}
 
 type VlessURL_stream_handler  func(src *conf.StreamConfig, dst url.Values)
 type VmessURL_stream_handler  func(src *conf.StreamConfig, dst map[string]string)
@@ -185,6 +205,14 @@ func __set_kv_stream_vless_trojan(src *conf.StreamConfig, dst url.Values) {
 					AddQuery (dst, "headerType", v.Type)
 					AddQuery (dst, "path", v.Request.Path)
 					AddQuery (dst, "host", v.Request.Headers["Host"])
+				}
+				break;
+			case "mkcp", "kcp":
+				if nil != src.KCPSettings.Seed {
+					AddQuery (dst, "path", *src.KCPSettings.Seed);
+				}
+				if v,e := encode_kcp_header(src.KCPSettings.HeaderConfig); nil == e {
+					AddQuery (dst, "headerType", v.Type)
 				}
 				break;
 			case "grpc":

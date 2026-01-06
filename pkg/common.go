@@ -44,6 +44,8 @@ const (
 	GRPC_Mode               // GRPC
 	GRPC_MultiMode
 	GRPC_ServiceName
+	KCP_SEED                // KCP (MKCP)
+	KCP_HType
 	// Protocol parts
 	Vxess_ID  // vless & vmess  we call them vxess
 	Vless_ENC
