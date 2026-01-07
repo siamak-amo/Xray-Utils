@@ -11,6 +11,17 @@ import (
 	log "github.com/siamak-amo/v2utils/log"
 )
 
+var (
+	trojan_stream_parser    = __stream_parser_vless_trojan
+    vless_stream_parser     = __stream_parser_vless_trojan
+    vmess_stream_parser     = __stream_parser_vmess
+
+    vless_security_parser   = __security_parser_vless_trojan
+	trojan_security_parser  = __security_parser_vless_trojan
+	vmess_security_parser   = __security_parser_vmess
+)
+
+
 func ParseURL(link string) (URLmap, error) {
 	u, e := url.Parse(link)
 	if nil != e {
@@ -43,73 +54,13 @@ func parse_vless_url (u *url.URL) (URLmap) {
 	res[ServerAddress] = u.Hostname()
 	res[Security] = params.Pop ("security")
 	res[Vless_ENC] = params.Pop ("encryption")
+	res[Vless_Level] = params.Pop ("level")
 
 	res[Network] = params.Pop ("type")
-	switch (res[Network]) {
-	case "ws":
-		// TODO: what about WS_Headers?
-		res[WS_Path] = params.Pop ("path")
-		res[WS_Host] = params.Pop ("host")
-		break;
+	vless_stream_parser (res, params);
+	vless_security_parser (res, params);
 
-	case "tcp":
-		res[TCP_HTTP_Host] = params.Pop ("host")
-		res[TCP_HTTP_Path] = params.Pop ("path")
-		res[TCP_HeaderType] = params.Pop ("headerType")
-		break;
-
-	case "kcp", "mkcp":
-		res[KCP_SEED] = params.Pop ("path");
-		res[KCP_HType] = params.Pop ("headerType");
-		break;
-
-	case "grpc":
-		res[GRPC_Mode] = params.Pop ("mode")
-		res[GRPC_MultiMode] = params.Pop ("multiMode")
-		res[GRPC_ServiceName] = params.Pop ("serviceName")
-		break;
-
-	case "xhttp", "splithttp":
-		res[XHTTP_Path] = params.Pop ("path")
-		res[XHTTP_Mode] = params.Pop ("mode")
-		res[XHTTP_Host] = params.Pop ("host")
-		break;
-
-	case "httpupgrade":
-		// TODO: HTTPUP_Headers
-		res[HTTPUP_Host] = params.Pop ("host")
-		res[HTTPUP_Path] = params.Pop ("path")
-		break;
-
-	default:
-		break;
-	}
-
-	switch (res[Security]) {
-	case "tls":
-		res[TLS_fp] = params.Pop ("fp")
-		res[TLS_sni] = params.Pop ("sni")
-		res[TLS_ALPN] = params.Pop ("alpn")
-		res[TLS_AllowInsecure] = params.Pop ("allowInsecure")
-		break;
-
-	case "reality":
-		res[REALITY_fp] = params.Pop ("fp")
-		res[REALITY_sni] = params.Pop ("sni")
-		res[REALITY_ShortID] = params.Pop ("sid")
-		res[REALITY_SpiderX] = params.Pop ("spx")
-		res[REALITY_PublicKey] = params.Pop ("pbk")
-		break;
-
-	default:
-		break;
-	}
-
-	for key, v := range params {
-		if len(v) >= 1 {
-			log.Warnf("parse_vless_url - parameter '%v' was ignored.\n", key)
-		}
-	}
+	extract_unused ("vless", params);
 	return res
 }
 
@@ -122,66 +73,23 @@ func parse_vmess_url (input string) (URLmap, error) {
 	if nil != e {
 		return nil, e
 	}
-	dst := make(Str2Str, 0)
-	if e = unmarshal_H (&dst, string(decoded)); nil != e {
+	src := make(Str2Str, 0)
+	if e = unmarshal_H (&src, string(decoded)); nil != e {
 		return nil, e
 	}
 
 	res := make (URLmap, 0)
 	res[Protocol] = "vmess"
-	res[ServerAddress] = dst.Pop ("add")
-	res[ServerPort] = dst.Pop ("port")
-	res[Vxess_ID] = dst.Pop ("id")
-	res[Network] = dst.Pop ("net")
+	res[ServerAddress] = src.Pop ("add")
+	res[ServerPort] = src.Pop ("port")
+	res[Vxess_ID] = src.Pop ("id")
+	res[Network] = src.Pop ("net")
 
-	switch (res[Network]) {
-	case "tcp":
-		res[TCP_HTTP_Host] = dst.Pop ("host")
-		res[TCP_HTTP_Path] = dst.Pop ("path")
-		res[TCP_HeaderType] = dst.Pop ("type")
-		break;
+	vmess_stream_parser (res, src);
+	vmess_security_parser (res, src);
 
-	case "grpc":
-		res[GRPC_Mode] = dst.Pop ("type")
-		break;
-
-	case "ws":
-		// TODO: WS_Headers
-		res[WS_Path] = dst.Pop ("path")
-		res[WS_Host] = dst.Pop ("host")
-		break;
-
-	case "xhttp", "splithttp":
-		// TODO: XHTTP_Headers
-		res[XHTTP_Host] = dst.Pop ("host")
-		res[XHTTP_Path] = dst.Pop ("path")
-		res[XHTTP_Mode] = dst.Pop ("mode")
-		break;
-
-	case "httpupgrade":
-		// TODO: HTTPUP_Headers
-		res[HTTPUP_Host] = dst.Pop ("host")
-		res[HTTPUP_Path] = dst.Pop ("path")
-		break;
-
-	default:
-		break;
-	}
-
-	if s := dst.Pop ("tls"); "tls" == s {
-		res[Security] = "tls"
-		res[TLS_sni] = dst.Pop ("sni")
-		res[TLS_fp] = dst.Pop ("fp")
-		res[TLS_ALPN] = dst.Pop ("alpn")
-		res[TLS_AllowInsecure] = dst.Pop ("allowInsecure")
-	}
-
-	dst.Pop ("aid"); dst.Pop ("scy"); dst.Pop ("ps"); dst.Pop ("v") // unused
-	for key, v := range dst {
-		if len(v) >= 1 {
-			log.Warnf("parse_vmess_url - parameter '%v' was ignored.\n", key)
-		}
-	}
+	src.Pop ("aid"); src.Pop ("scy"); src.Pop ("ps"); src.Pop ("v") // unused
+	extract_unused ("vmess", src);
 	return res, nil
 }
 
@@ -204,6 +112,8 @@ func parse_ss_url (u *url.URL) (URLmap, error) {
 	res[Protocol] = "shadowsocks"
 	res[ServerPort] = u.Port()
 	res[ServerAddress] = u.Hostname()
+
+	extract_unused ("shadowsocks", u.Query());
 	return res, nil
 }
 
@@ -219,64 +129,150 @@ func parse_trojan_url (u *url.URL) (URLmap) {
 
 	res[Network] = params.Pop ("type")
 	res[Security] = params.Pop ("security")
-	switch (res[Network]) {
-	case "ws":
-		// TODO: WS_Headers
-		res[WS_Path] = params.Pop ("path");
-		res[WS_Host] = params.Pop ("host");
-		break;
-	case "tcp":
-		res[TCP_HTTP_Host] = params.Pop ("host");
-		res[TCP_HTTP_Path] = params.Pop ("path");
-		res[TCP_HeaderType] = params.Pop ("headerType");
-		break;
-	case "grpc":
-		res[GRPC_Mode] = params.Pop ("mode")
-		res[GRPC_MultiMode] = params.Pop ("multiMode")
-		res[GRPC_ServiceName] = params.Pop ("serviceName")
-		break;
-	case "kcp", "mkcp":
-		res[KCP_SEED] = params.Pop ("path");
-		res[KCP_HType] = params.Pop ("headerType");
-		break;
-	case "xhttp", "splithttp":
-		res[XHTTP_Path] = params.Pop ("path")
-		res[XHTTP_Mode] = params.Pop ("mode")
-		res[XHTTP_Host] = params.Pop ("host")
-		break;
-	case "httpupgrade":
-		// TODO: HTTPUP_Headers
-		res[HTTPUP_Host] = params.Pop ("host")
-		res[HTTPUP_Path] = params.Pop ("path")
-		break;
-	default:
-		break;
-	}
 
-	switch (res[Security]) {
+	trojan_stream_parser (res, params);
+	trojan_security_parser (res, params);
+
+	extract_unused ("vmess", params);
+	return res
+}
+
+
+// Internal stream/security parser functions
+// Only use:  xxx_security_parser and xxx_stream_parser functions
+
+func __security_parser_vless_trojan (dst URLmap, src Str2Strr) {
+	switch (dst[Security]) {
 	case "tls":
-		res[TLS_fp] = params.Pop ("fp")
-		res[TLS_sni] = params.Pop ("sni")
-		res[TLS_ALPN] = params.Pop ("alpn")
-		res[TLS_AllowInsecure] = params.Pop ("allowInsecure")
+		dst[TLS_fp] = src.Pop ("fp")
+		dst[TLS_sni] = src.Pop ("sni")
+		dst[TLS_ALPN] = src.Pop ("alpn")
+		dst[TLS_AllowInsecure] = src.Pop ("allowInsecure")
 		break;
 
 	case "reality":
-		res[REALITY_fp] = params.Pop ("fp")
-		res[REALITY_sni] = params.Pop ("sni")
-		res[REALITY_ShortID] = params.Pop ("sid")
-		res[REALITY_SpiderX] = params.Pop ("spx")
-		res[REALITY_PublicKey] = params.Pop ("pbk")
+		dst[REALITY_fp] = src.Pop ("fp")
+		dst[REALITY_sni] = src.Pop ("sni")
+		dst[REALITY_ShortID] = src.Pop ("sid")
+		dst[REALITY_SpiderX] = src.Pop ("spx")
+		dst[REALITY_PublicKey] = src.Pop ("pbk")
 		break;
 
 	default:
 		break;
 	}
+}
 
-	for key, v := range params {
-		if len(v) >= 1 {
-			log.Warnf("parse_ss_url - parameter '%v' was ignored.\n", key)
-		}
+func __security_parser_vmess (dst URLmap, src Str2Str) {
+	if s := src.Pop ("tls"); "tls" == s {
+		dst[Security] = "tls"
+		dst[TLS_sni] = src.Pop ("sni")
+		dst[TLS_fp] = src.Pop ("fp")
+		dst[TLS_ALPN] = src.Pop ("alpn")
+		dst[TLS_AllowInsecure] = src.Pop ("allowInsecure")
 	}
-	return res
+}
+
+func __stream_parser_vless_trojan (dst URLmap, src Str2Strr) {
+	switch (dst[Network]) {
+	case "ws":
+		// TODO: what about WS_Headers?
+		dst[WS_Path] = src.Pop ("path")
+		dst[WS_Host] = src.Pop ("host")
+		break;
+
+	case "tcp":
+		dst[TCP_HTTP_Host] = src.Pop ("host")
+		dst[TCP_HTTP_Path] = src.Pop ("path")
+		dst[TCP_HeaderType] = src.Pop ("headerType")
+		break;
+
+	case "kcp", "mkcp":
+		dst[KCP_SEED] = src.Pop ("path");
+		dst[KCP_HType] = src.Pop ("headerType");
+		break;
+
+	case "grpc":
+		dst[GRPC_Mode] = src.Pop ("mode")
+		dst[GRPC_MultiMode] = src.Pop ("multiMode")
+		dst[GRPC_ServiceName] = src.Pop ("serviceName")
+		break;
+
+	case "xhttp", "splithttp":
+		dst[XHTTP_Path] = src.Pop ("path")
+		dst[XHTTP_Mode] = src.Pop ("mode")
+		dst[XHTTP_Host] = src.Pop ("host")
+		break;
+
+	case "httpupgrade":
+		// TODO: HTTPUP_Headers
+		dst[HTTPUP_Host] = src.Pop ("host")
+		dst[HTTPUP_Path] = src.Pop ("path")
+		break;
+
+	default:
+		break;
+	}
+}
+
+func __stream_parser_vmess (dst URLmap, src Str2Str) {
+	switch (dst[Network]) {
+	case "tcp":
+		dst[TCP_HTTP_Host] = src.Pop ("host")
+		dst[TCP_HTTP_Path] = src.Pop ("path")
+		dst[TCP_HeaderType] = src.Pop ("type")
+		break;
+
+	case "grpc":
+		dst[GRPC_Mode] = src.Pop ("type")
+		break;
+
+	case "ws":
+		// TODO: WS_Headers
+		dst[WS_Path] = src.Pop ("path")
+		dst[WS_Host] = src.Pop ("host")
+		break;
+
+	case "xhttp", "splithttp":
+		// TODO: XHTTP_Headers
+		dst[XHTTP_Host] = src.Pop ("host")
+		dst[XHTTP_Path] = src.Pop ("path")
+		dst[XHTTP_Mode] = src.Pop ("mode")
+		break;
+
+	case "httpupgrade":
+		// TODO: HTTPUP_Headers
+		dst[HTTPUP_Host] = src.Pop ("host")
+		dst[HTTPUP_Path] = src.Pop ("path")
+		break;
+
+	default:
+		break;
+	}
+}
+
+func extract_unused (name string, params any) {
+	switch x := params.(type) {
+	case Str2Str:
+		for key, v := range x {
+			if 0 != len(v) {
+				log.Warnf("%s parser - parameter '%v' was ignored.\n", name, key)
+			}
+		}
+		break;
+	case Str2Strr:
+		for key, v := range x {
+			if 0 != len(v) {
+				log.Warnf("%s parser - parameter '%v' was ignored.\n", name, key);
+			}
+		}
+		break;
+	case url.Values:
+		for key, _ := range x {
+			if 0 != len(key) {
+				log.Warnf("%s parser - parameter '%v' was ignored.\n", name, key);
+			}
+		}
+		break;
+	}
 }
