@@ -302,10 +302,9 @@ func (opt Opt) Do() {
 			result, duration := opt.V2.Test_URL(ln)
 			if ! opt.reverse {
 				if result {
+					fmt.Println(ln)
 					if opt.verbose {
 						log.Infof("`%s` OK (%d ms).\n", ln, duration)
-					} else {
-						fmt.Println(ln)
 					}
 				} else {
 					log.Infof("Broken URL '%s'\n", ln);
