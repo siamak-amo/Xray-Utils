@@ -63,7 +63,7 @@ func set_stream_grpc (args URLmap, dst *conf.StreamConfig) (error) {
 func set_stream_xhttp (args URLmap, dst *conf.StreamConfig) (error) {
 	args[XHTTP_Headers] = csv2jsonArray (args[XHTTP_Headers]);
 	return unmarshal_H (&dst.SplitHTTPSettings,
-		fmt.Sprintf (`{"host": "%s", "path": "%s", "mode": "%s", "headers": [%s]}`,
+		fmt.Sprintf (`{"host": "%s", "path": "%s", "mode": "%s", "headers": {%s}}`,
 			args[XHTTP_Host], args[XHTTP_Path], args[XHTTP_Mode], args[XHTTP_Headers],
 		),
 	);

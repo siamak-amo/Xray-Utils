@@ -93,6 +93,9 @@ func not_implemented (feature string) error {
 // converts: `x,y,z` -> `"x", "y", "z"`
 func csv2jsonArray (csv string) string {
 	var res string
+	if 0 == len(csv) {
+		return "";
+	}
 	for _, key := range strings.Split(csv, ",") {
 		res += `"` + key + `",`
 	}
